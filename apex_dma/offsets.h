@@ -51,6 +51,17 @@
     #define OFFSET_GLOW_ENABLE          0x3c8 //7 = enabled, 2 = disabled
     #define OFFSET_GLOW_THROUGH_WALLS   0x3d0 //2 = enabled, 5 = disabled
 
+    #define OFFSET_GLOW_ENABLE_GLOW_CONTEXT                 OFFSET_GLOW_ENABLE // Script_Highlight_SetCurrentContext
+    #define OFFSET_GLOW_THROUGH_WALLS_GLOW_VISIBLE_TYPE     OFFSET_GLOW_THROUGH_WALLS // Script_Highlight_SetVisibilityType 5th mov
+    #define GLOW_LIFE_TIME              0x3A4 // Script_Highlight_SetLifeTime + 4
+    #define GLOW_DISTANCE               0x3B4 // Script_Highlight_SetFarFadeDist
+    #define GLOW_TYPE                   0x2C4 // Script_Highlight_GetState + 4
+    #define GLOW_COLOR                  0x1D0 // Script_CopyHighlightState 15th mov
+    #define GLOW_FADE                   0x388 // Script_Highlight_GetCurrentInsideOpacity 3rd result of 3 offsets consecutive or first + 8    
+
+    #define OFFSET_IS_ATTACKING         0x075197f0 + 0x8 // kbutton_t in_attack state
+    #define OFFSET_AMMO_IN_CLIP         0x1624 // m_ammoInClip
+
 #elif VERSION == ORIGIN
 
     #define OFFSET_ENTITYLIST			0x1a73f68

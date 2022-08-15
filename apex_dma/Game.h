@@ -15,6 +15,22 @@ typedef struct Bone
 	float z;
 }Bone;
 
+struct GColor 
+{
+    float r, g, b;
+};
+
+struct GlowMode 
+{
+    int8_t GeneralGlowMode, BorderGlowMode, BorderSize, TransparentLevel;
+};
+
+struct Fade 
+{
+    int a, b;
+    float c, d, e, f;
+};
+
 class Entity
 {
 public:
@@ -32,17 +48,18 @@ public:
 	bool isGlowing();
 	bool isZooming();
 	Vector getAbsVelocity();
-	QAngle GetSwayAngles();
-	QAngle GetViewAngles();
+	Vector GetSwayAngles();
+	Vector GetViewAngles();
 	Vector GetCamPos();
-	QAngle GetRecoil();
+	Vector GetRecoil();
 	Vector GetViewAnglesV();
 	float GetYaw();
 
-	void enableGlow();
+
+	void enableGlow(GColor color);
 	void disableGlow();
 	void SetViewAngles(SVector angles);
-	void SetViewAngles(QAngle& angles);
+	void SetViewAngles(Vector& angles);
 	Vector getBonePosition(int id);
 	Vector getBonePositionByHitbox(int id);
 	bool Observing(uint64_t entitylist);
@@ -69,13 +86,11 @@ public:
 	float get_projectile_speed();
 	float get_projectile_gravity();
 	float get_zoom_fov();
-	int get_ammo();
 
 private:
 	float projectile_scale;
 	float projectile_speed;
 	float zoom_fov;
-	int ammo;
 };
 
 struct ClientClass {
@@ -92,6 +107,5 @@ Entity getEntity(uintptr_t ptr);
 Item getItem(uintptr_t ptr);
 bool WorldToScreen(Vector from, float* m_vMatrix, int targetWidth, int targetHeight, Vector& to);
 float CalculateFov(Entity& from, Entity& target);
-QAngle CalculateBestBoneAim(Entity& from, uintptr_t target, float max_fov);
+Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bone, int smooth, int aim_no_recoil);
 void get_class_name(uint64_t entity_ptr, char* out_str);
-void charge_rifle_hack(uint64_t entity_ptr);
