@@ -4,6 +4,7 @@
 int aim_key = VK_RBUTTON;
 int alt_aim_key = VK_LBUTTON;
 int alt_aim_key_acurate = VK_CAPITAL;
+int aim_key_cancel = VK_SHIFT;
 bool active = true;
 bool ready = false;
 int spectators = 128; //write
@@ -277,7 +278,7 @@ int main(int argc, char** argv)
 			std::this_thread::sleep_for(std::chrono::milliseconds(140));
 		}
 
-		if (IsKeyDown(aim_key) || IsKeyDown(alt_aim_key))
+		if ((IsKeyDown(aim_key) || IsKeyDown(alt_aim_key)) && !IsKeyDown(aim_key_cancel))
 		{
 			aiming = true;
 			if (IsKeyDown(alt_aim_key_acurate) && !(IsKeyDown(0x57) || IsKeyDown(0x53) || IsKeyDown(0x41) || IsKeyDown(0x44))) //acurate mode when crouch still
