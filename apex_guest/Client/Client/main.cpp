@@ -313,7 +313,7 @@ int main(int argc, char** argv)
 					{
 						player_glow = 0;
 						smooth = smooth_regular;
-						printf("spectator!! \t");
+						printf("spectator!! in acurate \t");
 					}
 				}
 
@@ -351,7 +351,7 @@ int main(int argc, char** argv)
 						{
 							player_glow = 0;
 							dynamic_smooth = 1;
-							printf("spectator!! \t");
+							printf("spectator!! in move\t");
 						}
 					}
 
@@ -371,7 +371,7 @@ int main(int argc, char** argv)
 					{
 						player_glow = 0;
 						dynamic_smooth = 1;
-						printf("spectator!! \t");
+						printf("spectator!! in still\t");
 					}
 				}
 				bonehitbox = 3;
