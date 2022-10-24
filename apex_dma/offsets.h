@@ -26,7 +26,7 @@
 
     #define OFFSET_ORIGIN				0x014c //m_vecAbsOrigin
     #define OFFSET_BONES				0x0e88 + 0x48 //m_nForceBone + 0x48
-    #define OFFSET_STUDIOHDR            0x10d8
+    #define OFFSET_STUDIOHDR            0x10d8 //CBaseAnimating!m_pStudioHdr
     #define OFFSET_AIMPUNCH				0x2440 //m_currentFrameLocalPlayer.m_vecPunchWeapon_Angle
     #define OFFSET_CAMERAPOS			0x1ee0 //CPlayer!camera_origin
     #define OFFSET_VIEWANGLES			0x253c - 0x14 //m_ammoPoolCapacity - 0x14
