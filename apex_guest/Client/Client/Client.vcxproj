@@ -15,7 +15,7 @@
     <ProjectGuid>{9BF6CD05-63DA-49CF-905E-B82F5F24AC6E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Client</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
     <ProjectName>Client</ProjectName>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>

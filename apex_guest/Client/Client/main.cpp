@@ -716,7 +716,7 @@ void Overlay::RenderEsp()
 							String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), GREEN, distance.c_str());  //DISTANCE
 					}
 					if (v.healthbar)
-						if (players[i].dist < 16000.0f)
+						if (players[i].dist < 12000.0f)
 						{
 
 							DrawSeerLikeHealth((players[i].b_x - (players[i].width / 2.0f) + 5), (players[i].b_y - players[i].height - 10), players[i].shield, players[i].maxshield, players[i].armortype, players[i].health); //health bar					
