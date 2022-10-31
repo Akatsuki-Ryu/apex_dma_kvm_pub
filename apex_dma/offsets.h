@@ -44,7 +44,11 @@
     #define OFFSET_ZOOM_FOV             0x1698 + 0xb8 //m_playerData + m_curZoomFOV
     #define OFFSET_AMMO                 0x1624 //m_ammoInClip
 
-    #define OFFSET_ITEM_GLOW            0x2c0 //m_highlightFunctionBits
+    #define OFFSET_ITEM_GLOW            0x02c0 //m_highlightFunctionBits
+    #define OFFSET_ITEM_ID              0x0589 // item id?
+    #define OFFSET_MODELNAME            0x0030 // m_ModelName
+    #define OFFSET_M_CUSTOMSCRIPTINT    0x1628 //m_customScriptInt
+    #define OFFSET_MINIMAP_SCALE        0x4560 //m_minimapTargetZoomScale, float
 
     #define OFFSET_GLOW_T1              0x262 //16256 = enabled, 0 = disabled
     #define OFFSET_GLOW_T2              0x2dc //1193322764 = enabled, 0 = disabled
@@ -57,12 +61,12 @@
     #define GLOW_DISTANCE               0x3B4 // Script_Highlight_SetFarFadeDist
     #define GLOW_TYPE                   0x2C4 // Script_Highlight_GetState + 4
     #define GLOW_COLOR                  0x1D0 // Script_CopyHighlightState 15th mov
-    #define GLOW_FADE                   0x388 // Script_Highlight_GetCurrentInsideOpacity 3rd result of 3 offsets consecutive or first + 8    
+    #define GLOW_FADE                   0x388 // Script_Highlight_GetCurrentInsideOpacity 3rd result of 3 offsets consecutive or first + 8
 
-
-    #define GLOW_COLOR_R 0x1D0
-    #define GLOW_COLOR_G 0x1D4
-    #define GLOW_COLOR_B 0x1D8
+    #define GLOW_COLOR_R                0x1D0
+    #define GLOW_COLOR_G                0x1D4
+    #define GLOW_COLOR_B                0x1D8
+    #define GLOW_START_TIME             0x2c4 //m_playerFloatLookStartTime=0x02c4
 
 
     #define OFFSET_IS_ATTACKING         0x075197f0 + 0x8 // kbutton_t in_attack state
