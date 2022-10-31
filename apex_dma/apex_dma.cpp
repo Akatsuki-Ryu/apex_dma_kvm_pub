@@ -15,7 +15,7 @@
 Memory apex_mem;
 Memory client_mem;
 
-bool DEBUG_PRINT = false; //todo consider remove
+
 //Just setting things up, dont edit.
 bool active = true;
 uintptr_t aimentity = 0;
@@ -23,7 +23,6 @@ uintptr_t tmp_aimentity = 0;
 uintptr_t lastaimentity = 0;
 float max = 999.0f;
 float max_dist = 300.0f*40.0f;	// ESP & Glow distance in meters (*40)
-int localTeamId = 0; //this might be int team_player
 //int tmp_spec = 0, spectators = 0; // defined below in the new version
 //int tmp_all_spec = 0, allied_spectators = 0; // defined below in the new version
 float max_fov = 10.0f;
@@ -183,8 +182,7 @@ bool weapon_sentinel  = false;
 bool weapon_bow  = false;
 
 
-//aim dist check. Just setting things up, dont edit.
-float aimdist = 200.0f * 40.0f;
+
 
 
 //item glow brightness. Just setting things up, dont edit.
@@ -353,7 +351,7 @@ void ProcessPlayer(Entity& LPlayer, Entity& target, uint64_t entitylist, int ind
 	Vector LocalPlayerPosition = LPlayer.getPosition();
 	float dist = LocalPlayerPosition.DistTo(EntityPosition);
 
-    if (dist > max_dist)// todo check which one is better
+    if (dist > max_dist)
     {
         if (target.isGlowing())
         {
@@ -364,14 +362,14 @@ void ProcessPlayer(Entity& LPlayer, Entity& target, uint64_t entitylist, int ind
 
 	//Prints POS of localplayer for map cords for full map radar. only enable when adding a new map or fixing a old one, will output to console.
 	//std::printf("  X: %.6f   ||    Y:%.6f",LocalPlayerPosition.x, LocalPlayerPosition.y); //Prints x and y cords of localplayer to get mainmap radar stuff.
-	if (dist > aimdist) return; //todo check which one is better
+
 	
 	
 	//Firing range stuff
-	if(!firing_range)
-		if (entity_team < 0 || entity_team>50 || entity_team == team_player) return; //todo check logic
+//	if(!firing_range)
+//		if (entity_team < 0 || entity_team>50 || entity_team == team_player) return; // can not aim at the team mate in the firing range
 
-    if (!target_allies && (entity_team == localTeamId)) return; //todo check logic
+    if (!target_allies && (entity_team == team_player)) return;
 
 	//Vis check aiming? dunno
 	if(aim==2)
@@ -430,13 +428,7 @@ void DoActions()
 
 			Entity LPlayer = getEntity(LocalPlayer);
 
-			localTeamId = LPlayer.getTeamId(); //todo original logic
-			if (localTeamId < 0 || localTeamId > 50)
-			{
-				continue;
-			}
-
-			team_player = LPlayer.getTeamId(); //todo new logic
+			team_player = LPlayer.getTeamId();
 			if (team_player < 0 || team_player>50)
 			{
 				continue;
@@ -519,7 +511,7 @@ void DoActions()
 						continue;
 					}
 					
-					ProcessPlayer(LPlayer, Target, entitylist, i);
+//					ProcessPlayer(LPlayer, Target, entitylist, i);
 
 					int entity_team = Target.getTeamId();
 					if (!target_allies &&(entity_team == team_player))
@@ -609,10 +601,10 @@ void DoActions()
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-player players[toRead]; //todo double check if it is duplicated
+player players[toRead]; //used for store player info in esp
 
 
-static void EspLoop()  //todo double check if it is duplicated
+static void EspLoop()
 {
 	esp_t = true;
 	while(esp_t)
@@ -924,7 +916,7 @@ static void AimbotLoop()
 
 
 //				Vector Angles = CalculateBestBoneAim(LPlayer, target, dynamicmax_fov, bone, dynamicsmooth, aim_no_recoil);
-				QAngle Angles = CalculateBestBoneAim(LPlayer, aimentity, dynamicmax_fov, bone, dynamicsmooth, aim_no_recoil); //todo tobe checked
+				QAngle Angles = CalculateBestBoneAim(LPlayer, aimentity, dynamicmax_fov, bone, dynamicsmooth, aim_no_recoil);
 				if (Angles.x == 0 && Angles.y == 0)
 				{
 					lock=false;
@@ -1223,7 +1215,7 @@ static void set_vars(uint64_t add_addr)
 	uint64_t itemglowbrightness_addr = 0;
 	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*91, itemglowbrightness_addr);
 	
-	//good god 91 of em.. why
+
 	
 
 	uint32_t check = 0;
@@ -1236,7 +1228,7 @@ static void set_vars(uint64_t add_addr)
 		return;
 	}
 	vars_t = true;
-	auto nextUpdateTime = std::chrono::system_clock::now() + std::chrono::seconds(5);//todo from old base
+	auto nextUpdateTime = std::chrono::system_clock::now() + std::chrono::seconds(5);//console timeout control
 
 	while(vars_t)
 	{
@@ -1339,10 +1331,10 @@ static void set_vars(uint64_t add_addr)
 			client_mem.Read<bool>(weapon_3030_repeater_addr, weapon_3030_repeater);
 			client_mem.Read<bool>(weapon_rampage_addr, weapon_rampage);
 			client_mem.Read<bool>(weapon_car_smg_addr, weapon_car_smg);
-			client_mem.Read<float>(aimdist_addr, aimdist);
+			client_mem.Read<float>(aimdist_addr, max_dist);
 			client_mem.Read<int>(itemglowbrightness_addr, itemglowbrightness);
 
-			if(esp && next2) //todo what is next2
+			if(esp && next2)
 			{
 				if(valid)
 				client_mem.WriteArray<player>(player_addr, players, toRead);
@@ -1358,7 +1350,7 @@ static void set_vars(uint64_t add_addr)
 				
 				next2 = false;
 
-			if (nextUpdateTime < std::chrono::system_clock::now()) { //todo maybe this is next2 implemnetation in the old code ?
+			if (nextUpdateTime < std::chrono::system_clock::now()) { // printing data to console timeout
 				PrintVarsToConsole();
 				nextUpdateTime = std::chrono::system_clock::now() + std::chrono::seconds(5);
 			}
