@@ -940,13 +940,13 @@ DWORD Overlay::CreateOverlay()
 			k_leftclick = false;
 		}
 
-		if (IsKeyDown(VK_INSERT) && !k_ins && ready)
+		if (IsKeyDown(VK_END) && !k_ins && ready)
 		{
 			show_menu = !show_menu;
 			ClickThrough(!show_menu);
 			k_ins = true;
 		}
-		else if (!IsKeyDown(VK_INSERT) && k_ins)
+		else if (!IsKeyDown(VK_END) && k_ins)
 		{
 			k_ins = false;
 		}
@@ -1118,8 +1118,8 @@ void DrawHexagonFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, con
 
 void Overlay::DrawSeerLikeHealth(float x, float y, int shield, int max_shield, int armorType, int health) {
 
-	int bg_offset = 3;
-	int bar_width = 158;
+	int bg_offset = 1;
+	int bar_width = 158/2;
 	// 4steps...2*3=6
 	// 38*4=152 152+6 = 158
 	// 5steps...2*4=8
@@ -1127,7 +1127,7 @@ void Overlay::DrawSeerLikeHealth(float x, float y, int shield, int max_shield, i
 	float max_health = 100.0f;
 	float shield_step = 25.0f;
 
-	int shield_25 = 30;
+	int shield_25 = 30/2;
 	int steps = 5;
 
 
