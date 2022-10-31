@@ -32,7 +32,7 @@ QAngle Math::CalcAngle(const Vector& src, const Vector& dst)
 	return angle;
 }
 
-double Math::GetFov_old(const QAngle& viewAngle, const QAngle& aimAngle, float distance) { //todo the getfov
+double Math::GetFov_old(const QAngle& viewAngle, const QAngle& aimAngle, float distance) { //not in use , can be removed
 	QAngle delta = aimAngle - viewAngle;
 	NormalizeAngles(delta);
 	float pitch = (float)sin(DegToRad(delta.x)) * distance;
@@ -41,7 +41,7 @@ double Math::GetFov_old(const QAngle& viewAngle, const QAngle& aimAngle, float d
 	return sqrt(powf(pitch, 2.0) + powf(yaw, 2.0));
 }
 
-double Math::GetFov(const QAngle& viewAngle, const QAngle& aimAngle) //todo this was getfov2
+double Math::GetFov(const QAngle& viewAngle, const QAngle& aimAngle)
 {
 	QAngle delta = aimAngle - viewAngle;
 	NormalizeAngles(delta);
