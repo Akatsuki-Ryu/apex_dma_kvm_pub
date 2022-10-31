@@ -1,5 +1,4 @@
 #include "prediction.h"
-#include "offsets.h"
 
 extern Memory apex_mem;
 
@@ -8,6 +7,7 @@ extern bool firing_range;
 extern float glowr;
 extern float glowg;
 extern float glowb;
+//glowtype logic to be checked
 extern int glowtype;
 extern int glowtype2;
 
@@ -50,7 +50,7 @@ void get_class_name(uint64_t entity_ptr, char* out_str)
 	apex_mem.ReadArray<char>(client_class.pNetworkName, out_str, 32);
 }
 
-void charge_rifle_hack(uint64_t entity_ptr)
+void charge_rifle_hack(uint64_t entity_ptr) //not in use
 {
 	extern uint64_t g_Base;
 	extern bool shooting;
@@ -79,6 +79,7 @@ int Entity::getHealth()
 	return *(int*)(buffer + OFFSET_HEALTH);
 }
 
+//seer health and shield i added
 #define OFFSET_ARMOR_TYPE             0x4604
 int Entity::getArmortype()
 {
@@ -112,6 +113,7 @@ bool Entity::isPlayer()
 	return *(uint64_t*)(buffer + OFFSET_NAME) == 125780153691248;
 }
 
+//firing range dummys
 bool Entity::isDummy()
 {
 	char class_name[33] = {};
@@ -151,7 +153,7 @@ Vector Entity::getBonePosition(int id) //todo this code is from the old base ,ch
 
 //https://www.unknowncheats.me/forum/apex-legends/496984-getting-hitbox-positions-cstudiohdr-externally.html
 //https://www.unknowncheats.me/forum/3499185-post1334.html
-
+//hitboxes
 Vector Entity::getBonePositionByHitbox(int id)
 {
 	Vector origin = getPosition();
@@ -225,7 +227,7 @@ bool Entity::isZooming()
 {
 	return *(int*)(buffer + OFFSET_ZOOMING) == 1;
 }
-
+//custom glow color RGB
 void Entity::enableGlow()
 {
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, glowtype);
@@ -292,7 +294,7 @@ void Entity::get_name(uint64_t g_Base, uint64_t index, char* name)
     apex_mem.Read<uint64_t>(g_Base + OFFSET_NAME_LIST + index, name_ptr);
 	apex_mem.ReadArray<char>(name_ptr, name, 32);
 }
-
+//Items
 bool Item::isItem()
 {
 	char class_name[33] = {};
@@ -300,13 +302,21 @@ bool Item::isItem()
 
 	return strncmp(class_name, "CPropSurvival", 13) == 0;
 }
-
+//Deathboxes
 bool Item::isBox()
 {
 	char class_name[33] = {};
 	get_class_name(ptr, class_name);
 
 	return strncmp(class_name, "CDeathBoxProp", 13) == 0;
+}
+//Traps
+bool Item::isTrap()
+{
+	char class_name[33] = {};
+	get_class_name(ptr, class_name);
+
+	return strncmp(class_name, "caustic_trap", 13) == 0;
 }
 
 bool Item::isGlowing()
@@ -423,6 +433,7 @@ QAngle CalculateBestBoneAim(Entity& from, uintptr_t t, float max_fov, int bone, 
 	SmoothedAngles.y = ViewAngles.y + (Delta.y / smooth) ;
 	SmoothedAngles.z = ViewAngles.z + (Delta.z / smooth) * (rand() % 10) / 7;
 	//std::cout << (Delta.x / smooth) * (rand() % 10) / 10 * (rand() % 2) << std::endl;
+
 
 	return SmoothedAngles;
 }
