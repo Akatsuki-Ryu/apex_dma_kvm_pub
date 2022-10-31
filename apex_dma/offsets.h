@@ -4,9 +4,9 @@
 #define VERSION STEAM
 
 #if VERSION == STEAM
-    #define OFFSET_ENTITYLIST			0x1a9e758
+    #define OFFSET_ENTITYLIST			0x1a9e758 //cl_entitylist
     #define OFFSET_LOCAL_ENT			0x1e4f268 //LocalPlayer
-    #define OFFSET_NAME_LIST            0xbacf500
+    #define OFFSET_NAME_LIST            0xbacf500 //NameList
     #define OFFSET_THIRDPERSON          0x01a83a30 + 0x6c //thirdperson_override + 0x6c
     #define OFFSET_TIMESCALE            0x0143e580 //host_timescale
 
