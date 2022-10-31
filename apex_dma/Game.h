@@ -15,17 +15,17 @@ typedef struct Bone
 	float z;
 }Bone;
 
-struct GColor 
+struct GColor //todo old codebase
 {
     float r, g, b;
 };
 
-struct GlowMode 
+struct GlowMode //todo old codebase
 {
     int8_t GeneralGlowMode, BorderGlowMode, BorderSize, TransparentLevel;
 };
 
-struct Fade 
+struct Fade //todo old codebase
 {
     int a, b;
     float c, d, e, f;
@@ -45,21 +45,23 @@ public:
 	int getTeamId();
 	int getHealth();
 	int getShield();
+	int getArmortype();
+	int getMaxshield();
 	bool isGlowing();
 	bool isZooming();
 	Vector getAbsVelocity();
-	Vector GetSwayAngles();
-	Vector GetViewAngles();
+	QAngle GetSwayAngles();
+	QAngle GetViewAngles();
 	Vector GetCamPos();
-	Vector GetRecoil();
+	QAngle GetRecoil();
 	Vector GetViewAnglesV();
 	float GetYaw();
 
-
-	void enableGlow(GColor color);
+	void enableGlow();
+//	void enableGlow(GColor color); //todo old code base
 	void disableGlow();
 	void SetViewAngles(SVector angles);
-	void SetViewAngles(Vector& angles);
+	void SetViewAngles(QAngle& angles);
 	Vector getBonePosition(int id);
 	Vector getBonePositionByHitbox(int id);
 	bool Observing(uint64_t entitylist);
@@ -73,11 +75,13 @@ public:
 	uint8_t buffer[0x3FF0];
 	Vector getPosition();
 	bool isItem();
+	bool isBox();
 	bool isGlowing();
-	
 	void enableGlow();
 	void disableGlow();
 };
+
+
 
 class WeaponXEntity
 {
@@ -86,11 +90,13 @@ public:
 	float get_projectile_speed();
 	float get_projectile_gravity();
 	float get_zoom_fov();
+	int get_ammo();
 
 private:
 	float projectile_scale;
 	float projectile_speed;
 	float zoom_fov;
+	int ammo;
 };
 
 struct ClientClass {
@@ -105,7 +111,10 @@ struct ClientClass {
 
 Entity getEntity(uintptr_t ptr);
 Item getItem(uintptr_t ptr);
+
 bool WorldToScreen(Vector from, float* m_vMatrix, int targetWidth, int targetHeight, Vector& to);
 float CalculateFov(Entity& from, Entity& target);
-Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bone, int smooth, int aim_no_recoil);
+//Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bone, int smooth, int aim_no_recoil); //todo old code base
+QAngle CalculateBestBoneAim(Entity& from, uintptr_t target, float max_fov, int bone, int smooth, int aim_no_recoil);
 void get_class_name(uint64_t entity_ptr, char* out_str);
+void charge_rifle_hack(uint64_t entity_ptr);

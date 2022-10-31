@@ -2,14 +2,28 @@
 
 extern Memory apex_mem;
 
+extern bool firing_range;
+//glow color and brigtness
+extern float glowr;
+extern float glowg;
+extern float glowb;
+extern int glowtype;
+extern int glowtype2;
+
+//float smooth = 100.0f;
+//bool aim_no_recoil = true;
+//int bone = 2;
+extern int smooth;
+extern int aim_no_recoil;
+extern int bone;
+
 bool Entity::Observing(uint64_t entitylist)
 {
 	/*uint64_t index = *(uint64_t*)(buffer + OFFSET_OBSERVING_TARGET);
 	index &= ENT_ENTRY_MASK;
 	if (index > 0)
 	{
-		uint64_t centity2 = 0;
-		apex_mem.Read<uint64_t>(entitylist + ((uint64_t)index << 5), centity2);
+		uint64_t centity2 = apex_mem.Read<uint64_t>(entitylist + ((uint64_t)index << 5));
 		return centity2;
 	}
 	return 0;*/
@@ -35,6 +49,25 @@ void get_class_name(uint64_t entity_ptr, char* out_str)
 	apex_mem.ReadArray<char>(client_class.pNetworkName, out_str, 32);
 }
 
+void charge_rifle_hack(uint64_t entity_ptr)
+{
+	extern uint64_t g_Base;
+	extern bool shooting;
+	WeaponXEntity curweap = WeaponXEntity();
+	curweap.update(entity_ptr);
+	float BulletSpeed = curweap.get_projectile_speed();
+	int ammo = curweap.get_ammo();
+
+	if (ammo != 0 && BulletSpeed == 1 && shooting)
+	{
+		apex_mem.Write<float>(g_Base + OFFSET_TIMESCALE + 0x68, std::numeric_limits<float>::min());
+	}
+	else
+	{
+		apex_mem.Write<float>(g_Base + OFFSET_TIMESCALE + 0x68, 1.f);
+	}
+}
+
 int Entity::getTeamId()
 {
 	return *(int*)(buffer + OFFSET_TEAM);
@@ -45,9 +78,22 @@ int Entity::getHealth()
 	return *(int*)(buffer + OFFSET_HEALTH);
 }
 
+#define OFFSET_ARMOR_TYPE             0x4604
+int Entity::getArmortype()
+{
+	int armortype;
+	apex_mem.Read<int>(ptr + OFFSET_ARMOR_TYPE, armortype);
+	return armortype;
+}
+
 int Entity::getShield()
 {
 	return *(int*)(buffer + OFFSET_SHIELD);
+}
+
+int Entity::getMaxshield()
+{
+	return *(int*)(buffer + OFFSET_MAXSHIELD);
 }
 
 Vector Entity::getAbsVelocity()
@@ -88,7 +134,7 @@ float Entity::lastVisTime()
   return *(float*)(buffer + OFFSET_VISIBLE_TIME);
 }
 
-Vector Entity::getBonePosition(int id)
+Vector Entity::getBonePosition(int id) //todo this code is from the old base ,check usage
 {
 	Vector position = getPosition();
 	uintptr_t boneArray = *(uintptr_t*)(buffer + OFFSET_BONES);
@@ -104,20 +150,21 @@ Vector Entity::getBonePosition(int id)
 
 //https://www.unknowncheats.me/forum/apex-legends/496984-getting-hitbox-positions-cstudiohdr-externally.html
 //https://www.unknowncheats.me/forum/3499185-post1334.html
+
 Vector Entity::getBonePositionByHitbox(int id)
 {
 	Vector origin = getPosition();
 
-	//BoneByHitBox
+    //BoneByHitBox
 	uint64_t Model = *(uint64_t*)(buffer + OFFSET_STUDIOHDR);
 
 	//get studio hdr
 	uint64_t StudioHdr;
 	apex_mem.Read<uint64_t>(Model + 0x8, StudioHdr);
 
-	//get hitbox array
+    //get hitbox array
 	int HitBoxsArray_set;
-	apex_mem.Read<int>(StudioHdr + 0xB4, HitBoxsArray_set);
+	apex_mem.Read<int>(StudioHdr + 0xB4,HitBoxsArray_set);
 	uint64_t HitBoxsArray = StudioHdr + HitBoxsArray_set;
 
 	int HitboxIndex;
@@ -126,10 +173,10 @@ Vector Entity::getBonePositionByHitbox(int id)
 	int Bone;
 	apex_mem.Read<int>(HitBoxsArray + HitboxIndex + (id * 0x2C), Bone);
 
-	if (Bone < 0 || Bone > 255)
+	if(Bone < 0 || Bone > 255)
 		return Vector();
 
-	//hitpos
+    //hitpos
 	uint64_t BoneArray = *(uint64_t*)(buffer + OFFSET_BONES);
 
 	matrix3x4_t Matrix = {};
@@ -138,14 +185,14 @@ Vector Entity::getBonePositionByHitbox(int id)
 	return Vector(Matrix.m_flMatVal[0][3] + origin.x, Matrix.m_flMatVal[1][3] + origin.y, Matrix.m_flMatVal[2][3] + origin.z);
 }
 
-Vector Entity::GetSwayAngles()
+QAngle Entity::GetSwayAngles() //todo need to confirm the vector and qangle stuff
 {
-	return *(Vector*)(buffer + OFFSET_BREATH_ANGLES);
+	return *(QAngle*)(buffer + OFFSET_BREATH_ANGLES);
 }
 
-Vector Entity::GetViewAngles()
+QAngle Entity::GetViewAngles()  //todo need to confirm the vector and qangle stuff
 {
-	return *(Vector*)(buffer + OFFSET_VIEWANGLES);
+	return *(QAngle*)(buffer + OFFSET_VIEWANGLES);
 }
 
 Vector Entity::GetViewAnglesV()
@@ -153,25 +200,24 @@ Vector Entity::GetViewAnglesV()
 	return *(Vector*)(buffer + OFFSET_VIEWANGLES);
 }
 
-
 float Entity::GetYaw()
 {
 	float yaw = 0;
 	apex_mem.Read<float>(ptr + OFFSET_YAW, yaw);
 
 	if (yaw < 0)
-		yaw += 360;
+    	yaw += 360;
 	yaw += 90;
 	if (yaw > 360)
-		yaw -= 360;
-
+    	yaw -= 360;
+		
 	return yaw;
 }
 
-
 bool Entity::isGlowing()
 {
-	return *(int*)(buffer + OFFSET_GLOW_ENABLE_GLOW_CONTEXT) == 1;
+//	return *(int*)(buffer + OFFSET_GLOW_ENABLE_GLOW_CONTEXT) == 1; //todo old code base , verify which one to use
+	return *(int*)(buffer + OFFSET_GLOW_ENABLE) == 7;
 }
 
 bool Entity::isZooming()
@@ -179,7 +225,17 @@ bool Entity::isZooming()
 	return *(int*)(buffer + OFFSET_ZOOMING) == 1;
 }
 
-void Entity::enableGlow(GColor color)
+void Entity::enableGlow()
+{
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, glowtype);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, glowtype2);
+	// Color
+	apex_mem.Write<float>(ptr + GLOW_COLOR_R, glowr);
+	apex_mem.Write<float>(ptr + GLOW_COLOR_G, glowg);
+	apex_mem.Write<float>(ptr + GLOW_COLOR_B, glowb);
+}
+
+void Entity::enableGlow(GColor color) //todo old code base
 {
 	apex_mem.Write<GlowMode>(ptr + GLOW_TYPE, { 101,102,96,90 });
 	apex_mem.Write<GColor>(ptr + GLOW_COLOR, color);
@@ -197,8 +253,15 @@ void Entity::enableGlow(GColor color)
 
 void Entity::disableGlow()
 {
+	apex_mem.Write<float>(ptr + GLOW_COLOR_R, 0.0f);
+	apex_mem.Write<float>(ptr + GLOW_COLOR_G, 0.0f);
+	apex_mem.Write<float>(ptr + GLOW_COLOR_B, 0.0f);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 2);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 5);
+
+	//todo old code base
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE_GLOW_CONTEXT, 0);
-	//mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS_GLOW_VISIBLE_TYPE, 5);
+    //mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS_GLOW_VISIBLE_TYPE, 5);
 }
 
 void Entity::SetViewAngles(SVector angles)
@@ -206,7 +269,7 @@ void Entity::SetViewAngles(SVector angles)
 	apex_mem.Write<SVector>(ptr + OFFSET_VIEWANGLES, angles);
 }
 
-void Entity::SetViewAngles(Vector& angles)
+void Entity::SetViewAngles(QAngle& angles)
 {
 	SetViewAngles(SVector(angles));
 }
@@ -216,9 +279,9 @@ Vector Entity::GetCamPos()
 	return *(Vector*)(buffer + OFFSET_CAMERAPOS);
 }
 
-Vector Entity::GetRecoil()
+QAngle Entity::GetRecoil()
 {
-	return *(Vector*)(buffer + OFFSET_AIMPUNCH);
+	return *(QAngle*)(buffer + OFFSET_AIMPUNCH);
 }
 
 void Entity::get_name(uint64_t g_Base, uint64_t index, char* name)
@@ -235,6 +298,14 @@ bool Item::isItem()
 	get_class_name(ptr, class_name);
 
 	return strncmp(class_name, "CPropSurvival", 13) == 0;
+}
+
+bool Item::isBox()
+{
+	char class_name[33] = {};
+	get_class_name(ptr, class_name);
+
+	return strncmp(class_name, "CDeathBoxProp", 13) == 0;
 }
 
 bool Item::isGlowing()
@@ -259,18 +330,36 @@ Vector Item::getPosition()
 
 float CalculateFov(Entity& from, Entity& target)
 {
-	Vector ViewAngles = from.GetViewAngles();
+	QAngle ViewAngles = from.GetViewAngles();
 	Vector LocalCamera = from.GetCamPos();
 	Vector EntityPosition = target.getPosition();
-	Vector Angle = Math::CalcAngle(LocalCamera, EntityPosition);
-	return Math::GetFov2(ViewAngles, Angle);
+	QAngle Angle = Math::CalcAngle(LocalCamera, EntityPosition);
+	return Math::GetFov(ViewAngles, Angle);
+//	return Math::GetFov2(ViewAngles, Angle); //todo old base
 }
 
-Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bone, int smooth, int aim_no_recoil)
+//Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bone, int smooth, int aim_no_recoil) //todo old base
+QAngle CalculateBestBoneAim(Entity& from, uintptr_t t, float max_fov, int bone, int smooth, int aim_no_recoil)
 {
+	Entity target = getEntity(t);
+	if(firing_range)
+	{
+		if (!target.isAlive())
+		{
+			return QAngle(0, 0, 0);
+		}
+	}
+	else
+	{
+		if (!target.isAlive() || target.isKnocked())
+		{
+			return QAngle(0, 0, 0);
+		}
+	}
+	
 	Vector LocalCamera = from.GetCamPos();
 	Vector TargetBonePosition = target.getBonePositionByHitbox(bone);
-	Vector CalculatedAngles = Vector(0, 0, 0);
+	QAngle CalculatedAngles = QAngle(0, 0, 0);
 	
 	WeaponXEntity curweap = WeaponXEntity();
 	curweap.update(from.ptr);
@@ -307,32 +396,34 @@ Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bon
 		Ctx.TargetVel = target.getAbsVelocity();
 
 		if (BulletPredict(Ctx))
-			CalculatedAngles = Vector{Ctx.AimAngles.x, Ctx.AimAngles.y, 0.f};
+			CalculatedAngles = QAngle{Ctx.AimAngles.x, Ctx.AimAngles.y, 0.f};
     }
 
-	if (CalculatedAngles == Vector(0, 0, 0))
+	if (CalculatedAngles == QAngle(0, 0, 0))
     	CalculatedAngles = Math::CalcAngle(LocalCamera, TargetBonePosition);
-	Vector ViewAngles = from.GetViewAngles();
-	Vector SwayAngles = from.GetSwayAngles();
-	//remove sway and recoil , currently only support remove recoil compeletely
+	QAngle ViewAngles = from.GetViewAngles();
+	QAngle SwayAngles = from.GetSwayAngles();
+	//remove sway and recoil
 	if(aim_no_recoil==2)
 		CalculatedAngles-=SwayAngles-ViewAngles;
 	Math::NormalizeAngles(CalculatedAngles);
-	Vector Delta = CalculatedAngles - ViewAngles;
-	double fov = Math::GetFov2(SwayAngles, CalculatedAngles);
+	QAngle Delta = CalculatedAngles - ViewAngles;
+	double fov = Math::GetFov(SwayAngles, CalculatedAngles);
+//	double fov = Math::GetFov2(SwayAngles, CalculatedAngles); //todo old code base
 	if (fov > max_fov)
 	{
-		return Vector(0, 0, 0);
+		return QAngle(0, 0, 0);
 	}
 
 	Math::NormalizeAngles(Delta);
 	
-	Vector SmoothedAngles = ViewAngles + Delta/smooth;
+	Vector SmoothedAngles = ViewAngles + Delta/smooth; //todo smoothing angle logic
 	SmoothedAngles.x = ViewAngles.x + (Delta.x / smooth)*(rand()%10)/7 ;
 	SmoothedAngles.y = ViewAngles.y + (Delta.y / smooth) ;
 	SmoothedAngles.z = ViewAngles.z + (Delta.z / smooth) * (rand() % 10) / 7;
 	//std::cout << (Delta.x / smooth) * (rand() % 10) / 10 * (rand() % 2) << std::endl;
 
+	QAngle SmoothedAngles = ViewAngles + Delta/smooth; //todo new code
 	return SmoothedAngles;
 }
 
@@ -351,6 +442,7 @@ Item getItem(uintptr_t ptr)
 	apex_mem.ReadArray<uint8_t>(ptr, entity.buffer, sizeof(entity.buffer));
 	return entity;
 }
+
 
 bool WorldToScreen(Vector from, float* m_vMatrix, int targetWidth, int targetHeight, Vector& to)
 {
@@ -395,6 +487,8 @@ void WeaponXEntity::update(uint64_t LocalPlayer)
     apex_mem.Read<float>(wep_entity + OFFSET_BULLET_SCALE, projectile_scale);
 	zoom_fov = 0;
     apex_mem.Read<float>(wep_entity + OFFSET_ZOOM_FOV, zoom_fov);
+		ammo = 0;
+    apex_mem.Read<int>(wep_entity + OFFSET_AMMO, ammo);
 }
 
 float WeaponXEntity::get_projectile_speed()
@@ -410,4 +504,9 @@ float WeaponXEntity::get_projectile_gravity()
 float WeaponXEntity::get_zoom_fov()
 {
 	return zoom_fov;
+}
+
+int WeaponXEntity::get_ammo()
+{
+	return ammo;
 }
