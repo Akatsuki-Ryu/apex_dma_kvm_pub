@@ -34,11 +34,11 @@ bool esp = true;
 int aim = 2; 					// 0 = off, 1 = on - no visibility check, 2 = on - use visibility check
 int player_glow = 2;			// 0 = off, 1 = on - not visible through walls, 2 = on - visible through walls
 float recoil_control = 0.50f;	// recoil reduction by this value, 1 = 100% = no recoil
-Vector last_sway = Vector();	// used to determine when to reduce recoil
+QAngle last_sway = QAngle();	// used to determine when to reduce recoil
 int last_sway_counter = 0;		// to determine if we might be shooting a semi-auto rifle so we need to hold to last_sway
 
 bool item_glow = true;
-bool player_glow = true;
+//bool player_glow = true;
 //extern bool aim_no_recoil;
 bool firing_range = false;
 bool target_allies = false;
@@ -786,8 +786,8 @@ static void AimbotLoop()
 				//printf("%f\n", dist);
 
 
-				Vector Angles = CalculateBestBoneAim(LPlayer, target, dynamicmax_fov, bone, dynamicsmooth, aim_no_recoil);
-				QAngle Angles = CalculateBestBoneAim(LPlayer, aimentity, max_fov); //todo tobe checked
+//				Vector Angles = CalculateBestBoneAim(LPlayer, target, dynamicmax_fov, bone, dynamicsmooth, aim_no_recoil);
+				QAngle Angles = CalculateBestBoneAim(LPlayer, aimentity, dynamicmax_fov, bone, dynamicsmooth, aim_no_recoil); //todo tobe checked
 				if (Angles.x == 0 && Angles.y == 0)
 				{
 					lock=false;
@@ -1029,11 +1029,12 @@ static void set_vars(uint64_t add_addr)
 	}
 	vars_t = false;
 }
+}
 
-// Item Glow Stuff
-struct GlowMode {
-	int8_t GeneralGlowMode, BorderGlowMode, BorderSize, TransparentLevel;
-};
+//// Item Glow Stuff // this is relocated into the game.h
+//struct GlowMode {
+//	int8_t GeneralGlowMode, BorderGlowMode, BorderSize, TransparentLevel;
+//};
  
 static void item_glow_t()
 {
@@ -1131,11 +1132,11 @@ static void RecoilLoop() //todo consider remove
 				}
 
 				Entity LPlayer = getEntity(LocalPlayer);
-				Vector ViewAngles = LPlayer.GetViewAngles();
-				Vector SwayAngles = LPlayer.GetSwayAngles();
+				QAngle ViewAngles = LPlayer.GetViewAngles();
+				QAngle SwayAngles = LPlayer.GetSwayAngles();
 
 			// calculate recoil angles
-			Vector recoilAngles = SwayAngles - ViewAngles;
+			QAngle recoilAngles = SwayAngles - ViewAngles;
 			if (recoilAngles.x == 0 || recoilAngles.y == 0 || (recoilAngles.x - last_sway.x) == 0) 
 				continue;
 
@@ -1181,8 +1182,8 @@ static void DebugLoop() //todo consider remove
 			int attackState = 0;
 			apex_mem.Read<int>(g_Base + OFFSET_IS_ATTACKING, attackState);
 			Vector LocalCamera = LPlayer.GetCamPos();
-			Vector ViewAngles = LPlayer.GetViewAngles();
-			Vector SwayAngles = LPlayer.GetSwayAngles();
+			QAngle ViewAngles = LPlayer.GetViewAngles();
+			QAngle SwayAngles = LPlayer.GetSwayAngles();
 
 			uint64_t wepHandle = 0;
 			apex_mem.Read<uint64_t>(LocalPlayer + OFFSET_WEAPON, wepHandle);

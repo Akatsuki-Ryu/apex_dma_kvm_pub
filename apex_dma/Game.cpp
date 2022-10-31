@@ -1,4 +1,5 @@
 #include "prediction.h"
+#include "offsets.h"
 
 extern Memory apex_mem;
 
@@ -417,13 +418,12 @@ QAngle CalculateBestBoneAim(Entity& from, uintptr_t t, float max_fov, int bone, 
 
 	Math::NormalizeAngles(Delta);
 	
-	Vector SmoothedAngles = ViewAngles + Delta/smooth; //todo smoothing angle logic
+	QAngle SmoothedAngles = ViewAngles + Delta/smooth; //todo smoothing angle logic
 	SmoothedAngles.x = ViewAngles.x + (Delta.x / smooth)*(rand()%10)/7 ;
 	SmoothedAngles.y = ViewAngles.y + (Delta.y / smooth) ;
 	SmoothedAngles.z = ViewAngles.z + (Delta.z / smooth) * (rand() % 10) / 7;
 	//std::cout << (Delta.x / smooth) * (rand() % 10) / 10 * (rand() % 2) << std::endl;
 
-	QAngle SmoothedAngles = ViewAngles + Delta/smooth; //todo new code
 	return SmoothedAngles;
 }
 

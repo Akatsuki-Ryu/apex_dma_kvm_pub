@@ -13,6 +13,7 @@
     #define OFFSET_TEAM					0x44c //m_iTeamNum
     #define OFFSET_HEALTH				0x43c //m_iHealth
     #define OFFSET_SHIELD				0x170 //m_shieldHealth
+    #define OFFSET_MAXSHIELD            0x174 //m_shieldHealthMax
     #define OFFSET_NAME					0x589 //m_iName
     #define OFFSET_SIGN_NAME			0x580 //m_iSignifierName
     #define OFFSET_ABS_VELOCITY         0x140 //m_vecAbsVelocity
@@ -57,6 +58,12 @@
     #define GLOW_TYPE                   0x2C4 // Script_Highlight_GetState + 4
     #define GLOW_COLOR                  0x1D0 // Script_CopyHighlightState 15th mov
     #define GLOW_FADE                   0x388 // Script_Highlight_GetCurrentInsideOpacity 3rd result of 3 offsets consecutive or first + 8    
+
+
+    #define GLOW_COLOR_R 0x1D0
+    #define GLOW_COLOR_G 0x1D4
+    #define GLOW_COLOR_B 0x1D8
+
 
     #define OFFSET_IS_ATTACKING         0x075197f0 + 0x8 // kbutton_t in_attack state
     #define OFFSET_AMMO_IN_CLIP         0x1624 // m_ammoInClip

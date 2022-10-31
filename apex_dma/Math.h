@@ -25,6 +25,7 @@ namespace Math
 {
 	void NormalizeAngles(QAngle& angle);
 	double GetFov(const QAngle& viewAngle, const QAngle& aimAngle);//tood there was another getfov need to check
+    double GetFov_old(const QAngle& viewAngle, const QAngle& aimAngle, float distance);
 	double DotProduct(const Vector& v1, const float* v2);
 	QAngle CalcAngle(const Vector& src, const Vector& dst);
 }

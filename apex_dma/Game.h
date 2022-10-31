@@ -58,7 +58,7 @@ public:
 	float GetYaw();
 
 	void enableGlow();
-//	void enableGlow(GColor color); //todo old code base
+	void enableGlow(GColor color); //todo old code base
 	void disableGlow();
 	void SetViewAngles(SVector angles);
 	void SetViewAngles(QAngle& angles);

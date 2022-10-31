@@ -32,8 +32,8 @@ QAngle Math::CalcAngle(const Vector& src, const Vector& dst)
 	return angle;
 }
 
-double Math::GetFov_old(const Vector& viewAngle, const Vector& aimAngle, float distance) { //todo the getfov
-	Vector delta = aimAngle - viewAngle;
+double Math::GetFov_old(const QAngle& viewAngle, const QAngle& aimAngle, float distance) { //todo the getfov
+	QAngle delta = aimAngle - viewAngle;
 	NormalizeAngles(delta);
 	float pitch = (float)sin(DegToRad(delta.x)) * distance;
 	float yaw = (float)sin(DegToRad(delta.y)) * distance;
