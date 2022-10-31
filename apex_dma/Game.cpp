@@ -137,7 +137,7 @@ float Entity::lastVisTime()
   return *(float*)(buffer + OFFSET_VISIBLE_TIME);
 }
 
-Vector Entity::getBonePosition(int id) //todo this code is from the old base ,check usage
+Vector Entity::getBonePosition(int id) //not in use , use getBonePositionByHitbox instead
 {
 	Vector position = getPosition();
 	uintptr_t boneArray = *(uintptr_t*)(buffer + OFFSET_BONES);
@@ -188,12 +188,12 @@ Vector Entity::getBonePositionByHitbox(int id)
 	return Vector(Matrix.m_flMatVal[0][3] + origin.x, Matrix.m_flMatVal[1][3] + origin.y, Matrix.m_flMatVal[2][3] + origin.z);
 }
 
-QAngle Entity::GetSwayAngles() //todo need to confirm the vector and qangle stuff
+QAngle Entity::GetSwayAngles()
 {
 	return *(QAngle*)(buffer + OFFSET_BREATH_ANGLES);
 }
 
-QAngle Entity::GetViewAngles()  //todo need to confirm the vector and qangle stuff
+QAngle Entity::GetViewAngles()
 {
 	return *(QAngle*)(buffer + OFFSET_VIEWANGLES);
 }
@@ -219,7 +219,7 @@ float Entity::GetYaw()
 
 bool Entity::isGlowing()
 {
-//	return *(int*)(buffer + OFFSET_GLOW_ENABLE_GLOW_CONTEXT) == 1; //todo old code base , verify which one to use
+//	return *(int*)(buffer + OFFSET_GLOW_ENABLE) == 1; //todo old code base , which one is correct , 1 or 7
 	return *(int*)(buffer + OFFSET_GLOW_ENABLE) == 7;
 }
 
@@ -231,14 +231,14 @@ bool Entity::isZooming()
 void Entity::enableGlow()
 {
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, glowtype);
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, glowtype2);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, glowtype2); //todo which one is correct ,1 or 2
 	// Color
 	apex_mem.Write<float>(ptr + GLOW_COLOR_R, glowr);
 	apex_mem.Write<float>(ptr + GLOW_COLOR_G, glowg);
 	apex_mem.Write<float>(ptr + GLOW_COLOR_B, glowb);
 }
 
-void Entity::enableGlow(GColor color) //todo old code base
+void Entity::enableGlow(GColor color) //todo old code base, which one to use
 {
 	apex_mem.Write<GlowMode>(ptr + GLOW_TYPE, { 101,102,96,90 });
 	apex_mem.Write<GColor>(ptr + GLOW_COLOR, color);
@@ -249,8 +249,8 @@ void Entity::enableGlow(GColor color) //todo old code base
 
 	currentEntityTime -= 1.f;
 
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE_GLOW_CONTEXT, 1);
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS_GLOW_VISIBLE_TYPE, 1);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 1);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 1);
 	apex_mem.Write<Fade>(ptr + GLOW_FADE, { 872415232, 872415232, currentEntityTime, currentEntityTime, currentEntityTime, currentEntityTime });
 }
 
@@ -259,12 +259,12 @@ void Entity::disableGlow()
 	apex_mem.Write<float>(ptr + GLOW_COLOR_R, 0.0f);
 	apex_mem.Write<float>(ptr + GLOW_COLOR_G, 0.0f);
 	apex_mem.Write<float>(ptr + GLOW_COLOR_B, 0.0f);
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 2);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 2); //todo which is correct, 2 or 0
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 5);
 
 	//todo old code base
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE_GLOW_CONTEXT, 0);
-    //mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS_GLOW_VISIBLE_TYPE, 5);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 0);//todo which is correct, 2 or 0
+    //mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 5);
 }
 
 void Entity::SetViewAngles(SVector angles)
@@ -346,13 +346,11 @@ float CalculateFov(Entity& from, Entity& target)
 	Vector EntityPosition = target.getPosition();
 	QAngle Angle = Math::CalcAngle(LocalCamera, EntityPosition);
 	return Math::GetFov(ViewAngles, Angle);
-//	return Math::GetFov2(ViewAngles, Angle); //todo old base
 }
 
-//Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bone, int smooth, int aim_no_recoil) //todo old base
-QAngle CalculateBestBoneAim(Entity& from, uintptr_t t, float max_fov, int bone, int smooth, int aim_no_recoil)
+QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, int bone, int smooth, int aim_no_recoil)
 {
-	Entity target = getEntity(t);
+	Entity target = getEntity(targetptr);
 	if(firing_range)
 	{
 		if (!target.isAlive())
@@ -420,7 +418,7 @@ QAngle CalculateBestBoneAim(Entity& from, uintptr_t t, float max_fov, int bone, 
 	Math::NormalizeAngles(CalculatedAngles);
 	QAngle Delta = CalculatedAngles - ViewAngles;
 	double fov = Math::GetFov(SwayAngles, CalculatedAngles);
-//	double fov = Math::GetFov2(SwayAngles, CalculatedAngles); //todo old code base
+
 	if (fov > max_fov)
 	{
 		return QAngle(0, 0, 0);
@@ -428,7 +426,7 @@ QAngle CalculateBestBoneAim(Entity& from, uintptr_t t, float max_fov, int bone, 
 
 	Math::NormalizeAngles(Delta);
 	
-	QAngle SmoothedAngles = ViewAngles + Delta/smooth; //todo smoothing angle logic
+	QAngle SmoothedAngles = ViewAngles + Delta/smooth;
 	SmoothedAngles.x = ViewAngles.x + (Delta.x / smooth)*(rand()%10)/7 ;
 	SmoothedAngles.y = ViewAngles.y + (Delta.y / smooth) ;
 	SmoothedAngles.z = ViewAngles.z + (Delta.z / smooth) * (rand() % 10) / 7;

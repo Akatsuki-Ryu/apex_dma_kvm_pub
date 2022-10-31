@@ -115,7 +115,6 @@ Item getItem(uintptr_t ptr);
 
 bool WorldToScreen(Vector from, float* m_vMatrix, int targetWidth, int targetHeight, Vector& to);
 float CalculateFov(Entity& from, Entity& target);
-//Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bone, int smooth, int aim_no_recoil); //todo old code base
-QAngle CalculateBestBoneAim(Entity& from, uintptr_t target, float max_fov, int bone, int smooth, int aim_no_recoil);
+QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, int bone, int smooth, int aim_no_recoil);
 void get_class_name(uint64_t entity_ptr, char* out_str);
 void charge_rifle_hack(uint64_t entity_ptr);
