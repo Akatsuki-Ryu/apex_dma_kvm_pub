@@ -41,7 +41,7 @@ bool item_glow = true;
 //extern bool aim_no_recoil;
 bool firing_range = false;
 bool target_allies = false;
-int aim_no_recoil = 0;			//  0= normal recoil, 1 = use recoil control, 2 = aiming no recoil // when using recoil control , make sure the aimbot is off
+bool aim_no_recoil = false;			//  0= normal recoil, 1 = no recoil
 int safe_level = 0;
 bool aiming = false;
 //extern float smooth;
@@ -159,7 +159,7 @@ bool weapon_volt  = false;
 //Heavy Weapons
 bool weapon_flatline = false;
 bool weapon_hemlock  = false;
-bool weapon_3030_repeater = false; 
+bool weapon_3030_repeater = false;
 bool weapon_rampage  = false;
 bool weapon_car_smg  = false;
 
@@ -1004,20 +1004,12 @@ static void PrintVarsToConsole() {
 	printf((target_allies ? "   ON\t" : "   OFF\t"));
 
 	// recoil + key
-	switch (aim_no_recoil)
-	{
-	case 0:
-		printf("\t  OFF\t");
-		break;
-	case 1:
-		printf("\t  RCS\t");
-		break;
-	case 2:
-		printf("\t  ON\t");
-		break;
-	default:
-		printf("  --\t");
-		break;
+	if (!aim_no_recoil) {
+        printf("\t  OFF\t");
+    }
+    else
+    {
+        printf("\t  ON\t");
 	}
 
 
@@ -1254,7 +1246,7 @@ static void set_vars(uint64_t add_addr)
 //			client_mem.Read<bool>(aim_no_recoil_addr, aim_no_recoil);
 //			client_mem.Read<float>(smooth_addr, smooth);
 			client_mem.Read<int>(player_glow_addr, player_glow);
-			client_mem.Read<int>(aim_no_recoil_addr, aim_no_recoil);
+			client_mem.Read<bool>(aim_no_recoil_addr, aim_no_recoil);
 			client_mem.Read<int>(smooth_addr, smooth);
 			client_mem.Read<float>(max_fov_addr, max_fov);
 			client_mem.Read<int>(bone_addr, bone);

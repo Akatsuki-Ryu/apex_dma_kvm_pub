@@ -15,7 +15,7 @@ extern int glowtype2;
 //bool aim_no_recoil = true;
 //int bone = 2;
 extern int smooth;
-extern int aim_no_recoil;
+extern bool aim_no_recoil;
 extern int bone;
 
 bool Entity::Observing(uint64_t entitylist)
@@ -348,7 +348,7 @@ float CalculateFov(Entity& from, Entity& target)
 	return Math::GetFov(ViewAngles, Angle);
 }
 
-QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, int bone, int smooth, int aim_no_recoil)
+QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, int bone, int smooth, bool aim_no_recoil)
 {
 	Entity target = getEntity(targetptr);
 	if(firing_range)
@@ -413,7 +413,7 @@ QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, in
 	QAngle ViewAngles = from.GetViewAngles();
 	QAngle SwayAngles = from.GetSwayAngles();
 	//remove sway and recoil
-	if(aim_no_recoil==2)
+	if(aim_no_recoil==true)
 		CalculatedAngles-=SwayAngles-ViewAngles;
 	Math::NormalizeAngles(CalculatedAngles);
 	QAngle Delta = CalculatedAngles - ViewAngles;
