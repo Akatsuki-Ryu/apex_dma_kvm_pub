@@ -52,7 +52,7 @@ bool aim_no_recoil = true;
 bool aiming = false; //read
 uint64_t g_Base = 0; //write
 float max_dist = 3800.0f * 40.0f; //read //Max Distance of ESP 3800 is full map
-float smooth = 110.0f; //Min 100 for safe aimbotting
+int smooth = 50; //Min 100 for safe aimbotting
 float max_fov = 15.0f; //15 is the sweetspot for 1080p
 // Dynamic Fov
 float dynamicfov = 10;
