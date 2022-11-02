@@ -7,16 +7,13 @@ extern bool firing_range;
 extern float glowr;
 extern float glowg;
 extern float glowb;
-//glowtype logic to be checked
+//glowtype not used, but dont delete its still used.
 extern int glowtype;
 extern int glowtype2;
-
-//float smooth = 100.0f;
-//bool aim_no_recoil = true;
-//int bone = 2;
-extern int smooth;
-extern bool aim_no_recoil;
-extern int bone;
+//setting up vars, dont edit 
+float smooth = 100.0f;
+bool aim_no_recoil = true;
+int bone = 2;
 
 bool Entity::Observing(uint64_t entitylist)
 {
@@ -49,8 +46,8 @@ void get_class_name(uint64_t entity_ptr, char* out_str)
 
 	apex_mem.ReadArray<char>(client_class.pNetworkName, out_str, 32);
 }
-
-void charge_rifle_hack(uint64_t entity_ptr) //not in use
+//patched out but left in for reasons
+void charge_rifle_hack(uint64_t entity_ptr)
 {
 	extern uint64_t g_Base;
 	extern bool shooting;
@@ -78,7 +75,6 @@ int Entity::getHealth()
 {
 	return *(int*)(buffer + OFFSET_HEALTH);
 }
-
 //seer health and shield i added
 #define OFFSET_ARMOR_TYPE             0x4604
 int Entity::getArmortype()
@@ -112,7 +108,6 @@ bool Entity::isPlayer()
 {
 	return *(uint64_t*)(buffer + OFFSET_NAME) == 125780153691248;
 }
-
 //firing range dummys
 bool Entity::isDummy()
 {
@@ -135,20 +130,6 @@ bool Entity::isAlive()
 float Entity::lastVisTime()
 {
   return *(float*)(buffer + OFFSET_VISIBLE_TIME);
-}
-
-Vector Entity::getBonePosition(int id) //not in use , use getBonePositionByHitbox instead
-{
-	Vector position = getPosition();
-	uintptr_t boneArray = *(uintptr_t*)(buffer + OFFSET_BONES);
-	Vector bone = Vector();
-	uint32_t boneloc = (id * 0x30);
-	Bone bo = {};
-	apex_mem.Read<Bone>(boneArray + boneloc, bo);
-	bone.x = bo.x + position.x;
-	bone.y = bo.y + position.y;
-	bone.z = bo.z + position.z;
-	return bone;
 }
 
 //https://www.unknowncheats.me/forum/apex-legends/496984-getting-hitbox-positions-cstudiohdr-externally.html
@@ -219,7 +200,6 @@ float Entity::GetYaw()
 
 bool Entity::isGlowing()
 {
-//	return *(int*)(buffer + OFFSET_GLOW_ENABLE) == 1; //todo old code base , which one is correct , 1 or 7
 	return *(int*)(buffer + OFFSET_GLOW_ENABLE) == 7;
 }
 
@@ -231,27 +211,11 @@ bool Entity::isZooming()
 void Entity::enableGlow()
 {
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, glowtype);
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, glowtype2); //todo which one is correct ,1 or 2
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, glowtype2);
 	// Color
 	apex_mem.Write<float>(ptr + GLOW_COLOR_R, glowr);
 	apex_mem.Write<float>(ptr + GLOW_COLOR_G, glowg);
 	apex_mem.Write<float>(ptr + GLOW_COLOR_B, glowb);
-}
-
-void Entity::enableGlow(GColor color) //todo old code base, which one to use
-{
-	apex_mem.Write<GlowMode>(ptr + GLOW_TYPE, { 101,102,96,90 });
-	apex_mem.Write<GColor>(ptr + GLOW_COLOR, color);
-
-	float currentEntityTime = 5000.f;
-	apex_mem.Write<float>(ptr + GLOW_DISTANCE, 20000.f);
-	apex_mem.Write<float>(ptr + GLOW_LIFE_TIME, currentEntityTime);
-
-	currentEntityTime -= 1.f;
-
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 1);
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 1);
-	apex_mem.Write<Fade>(ptr + GLOW_FADE, { 872415232, 872415232, currentEntityTime, currentEntityTime, currentEntityTime, currentEntityTime });
 }
 
 void Entity::disableGlow()
@@ -259,12 +223,8 @@ void Entity::disableGlow()
 	apex_mem.Write<float>(ptr + GLOW_COLOR_R, 0.0f);
 	apex_mem.Write<float>(ptr + GLOW_COLOR_G, 0.0f);
 	apex_mem.Write<float>(ptr + GLOW_COLOR_B, 0.0f);
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 2); //todo which is correct, 2 or 0
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 2);
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 5);
-
-	//todo old code base
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 0);//todo which is correct, 2 or 0
-    //mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 5);
 }
 
 void Entity::SetViewAngles(SVector angles)
@@ -348,9 +308,9 @@ float CalculateFov(Entity& from, Entity& target)
 	return Math::GetFov(ViewAngles, Angle);
 }
 
-QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, int bone, int smooth, bool aim_no_recoil)
+QAngle CalculateBestBoneAim(Entity& from, uintptr_t t, float max_fov)
 {
-	Entity target = getEntity(targetptr);
+	Entity target = getEntity(t);
 	if(firing_range)
 	{
 		if (!target.isAlive())
@@ -413,26 +373,19 @@ QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, in
 	QAngle ViewAngles = from.GetViewAngles();
 	QAngle SwayAngles = from.GetSwayAngles();
 	//remove sway and recoil
-	if(aim_no_recoil==true)
+	if(aim_no_recoil)
 		CalculatedAngles-=SwayAngles-ViewAngles;
 	Math::NormalizeAngles(CalculatedAngles);
 	QAngle Delta = CalculatedAngles - ViewAngles;
 	double fov = Math::GetFov(SwayAngles, CalculatedAngles);
-
 	if (fov > max_fov)
 	{
 		return QAngle(0, 0, 0);
 	}
 
 	Math::NormalizeAngles(Delta);
-	
+
 	QAngle SmoothedAngles = ViewAngles + Delta/smooth;
-	SmoothedAngles.x = ViewAngles.x + (Delta.x / smooth)*(rand()%10)/7 ;
-	SmoothedAngles.y = ViewAngles.y + (Delta.y / smooth) ;
-	SmoothedAngles.z = ViewAngles.z + (Delta.z / smooth) * (rand() % 10) / 7;
-	//std::cout << (Delta.x / smooth) * (rand() % 10) / 10 * (rand() % 2) << std::endl;
-
-
 	return SmoothedAngles;
 }
 

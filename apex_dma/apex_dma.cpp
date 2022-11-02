@@ -9,43 +9,28 @@
 #include "Game.h"
 #include <thread>
 //this is a test, with seconds
-#include <fcntl.h>
-#include <sys/stat.h>
-
 Memory apex_mem;
 Memory client_mem;
 
-
 //Just setting things up, dont edit.
+bool firing_range = false;
 bool active = true;
 uintptr_t aimentity = 0;
 uintptr_t tmp_aimentity = 0;
 uintptr_t lastaimentity = 0;
 float max = 999.0f;
-float max_dist = 300.0f*40.0f;	// ESP & Glow distance in meters (*40)
-//int tmp_spec = 0, spectators = 0; // defined below in the new version
-//int tmp_all_spec = 0, allied_spectators = 0; // defined below in the new version
-float max_fov = 10.0f;
+float max_dist = 200.0f*40.0f;
 int team_player = 0;
+float max_fov = 25;
 const int toRead = 100;
-//int aim = true;
+int aim = true;
 bool esp = true;
-int aim = 2; 					// 0 = off, 1 = on - no visibility check, 2 = on - use visibility check
-int player_glow = 2;			// 0 = off, 1 = on - not visible through walls, 2 = on - visible through walls
-float recoil_control = 0.50f;	// recoil reduction by this value, 1 = 100% = no recoil
-QAngle last_sway = QAngle();	// used to determine when to reduce recoil
-int last_sway_counter = 0;		// to determine if we might be shooting a semi-auto rifle so we need to hold to last_sway
-
 bool item_glow = true;
-//bool player_glow = true;
-//extern bool aim_no_recoil;
-bool firing_range = false;
-bool target_allies = false;
-bool aim_no_recoil = false;			//  0= normal recoil, 1 = no recoil
-int safe_level = 0;
+bool player_glow = true;
+extern bool aim_no_recoil;
 bool aiming = false;
-//extern float smooth;
-//extern int bone;
+extern float smooth;
+extern int bone;
 bool thirdperson = false;
 
 
@@ -53,12 +38,6 @@ bool thirdperson = false;
 bool chargerifle = false;
 bool shooting = false;
 
-int smooth = 50;
-int bone = 3;
-bool walls = false;
-int dynamicsmooth = 50;
-float dynamicmax_fov = 10.0f;
-bool thirdPerson = false;
 
 //Player Glow Color and Brightness. Just setting things up, dont edit.
 float glowr = 0.0f; //Red 0-255, higher is brighter color.
@@ -159,7 +138,7 @@ bool weapon_volt  = false;
 //Heavy Weapons
 bool weapon_flatline = false;
 bool weapon_hemlock  = false;
-bool weapon_3030_repeater = false;
+bool weapon_3030_repeater = false; 
 bool weapon_rampage  = false;
 bool weapon_car_smg  = false;
 
@@ -182,7 +161,8 @@ bool weapon_sentinel  = false;
 bool weapon_bow  = false;
 
 
-
+//aim dist check. Just setting things up, dont edit.
+float aimdist = 200.0f * 40.0f;
 
 
 //item glow brightness. Just setting things up, dont edit.
@@ -226,7 +206,7 @@ typedef struct player
 }player;
 
 
-
+//Your in the matrix neo.
 struct Matrix
 {
 	float matrix[16];
@@ -245,92 +225,10 @@ int tmp_all_spec = 0, allied_spectators = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-void SetPlayerGlow(Entity& LPlayer, Entity& Target, int index)
-{
-	if (player_glow >= 1)
-	{
-		if (LPlayer.getPosition().z < 8000.f && Target.getPosition().z < 8000.f)
-		{
-			if (!Target.isGlowing() || (int)Target.buffer[OFFSET_GLOW_THROUGH_WALLS_GLOW_VISIBLE_TYPE] != 1 || (int)Target.buffer[GLOW_FADE] != 872415232) {
-				float currentEntityTime = 5000.f;
-				if (!isnan(currentEntityTime) && currentEntityTime > 0.f) {
-					GColor color;
-					if ((Target.getTeamId() == LPlayer.getTeamId()) && !target_allies)
-					{
-						color = { 0.f, 2.f, 3.f };
-					}
-					else if (!(firing_range) && (Target.isKnocked() || !Target.isAlive()))
-					{
-						color = { 3.f, 3.f, 3.f };
-					}
-					else if (Target.lastVisTime() > lastvis_aim[index] || (Target.lastVisTime() < 0.f && lastvis_aim[index] > 0.f))
-					{
-						color = { 0.f, 1.f, 0.f };
-					}
-					else
-					{
-						int shield = Target.getShield();
-
-						if (shield > 100)
-						{ //Heirloom armor - Red
-							color = { 3.f, 0.f, 0.f };
-						}
-						else if (shield > 75)
-						{ //Purple armor - Purple
-							color = { 1.84f, 0.46f, 2.07f };
-						}
-						else if (shield > 50)
-						{ //Blue armor - Light blue
-							color = { 0.39f, 1.77f, 2.85f };
-						}
-						else if (shield > 0)
-						{ //White armor - White
-							color = { 2.f, 2.f, 2.f };
-						}
-						else if (Target.getHealth() > 50)
-						{ //Above 50% HP - Orange
-							color = { 3.5f, 1.8f, 0.f };
-						}
-						else
-						{ //Below 50% HP - Light Red
-							color = { 3.28f, 0.78f, 0.63f };
-						}
-					}
-
-					Target.enableGlow(color);
-				}
-			}
-		}
-
-	}
-	else if ((player_glow == 0) && Target.isGlowing())
-	{
-		Target.disableGlow();
-	}
-}
-
 
 void ProcessPlayer(Entity& LPlayer, Entity& target, uint64_t entitylist, int index)
 {
 	int entity_team = target.getTeamId();
-
-	/*bool obs = target.Observing(entitylist);
-	if (obs)
-	{
-		if(obs == LPlayer.ptr)
-		{
-			if (entity_team == localTeamId)
-			{
-				tmp_all_spec++;
-			}
-			else
-			{
-				tmp_spec++;
-			}
-		}
-		tmp_spec++;
-		return;
-	}*/
 
 	if (!target.isAlive())
 	{
@@ -350,27 +248,16 @@ void ProcessPlayer(Entity& LPlayer, Entity& target, uint64_t entitylist, int ind
 	Vector EntityPosition = target.getPosition();
 	Vector LocalPlayerPosition = LPlayer.getPosition();
 	float dist = LocalPlayerPosition.DistTo(EntityPosition);
-
-    if (dist > max_dist)
-    {
-        if (target.isGlowing())
-        {
-            target.disableGlow();
-        }
-        return;
-    }
-
 	//Prints POS of localplayer for map cords for full map radar. only enable when adding a new map or fixing a old one, will output to console.
 	//std::printf("  X: %.6f   ||    Y:%.6f",LocalPlayerPosition.x, LocalPlayerPosition.y); //Prints x and y cords of localplayer to get mainmap radar stuff.
-
+	if (dist > aimdist) return;
 	
 	
 	//Firing range stuff
-//	if(!firing_range)
-//		if (entity_team < 0 || entity_team>50 || entity_team == team_player) return; // can not aim at the team mate in the firing range
-
-    if (!target_allies && (entity_team == team_player)) return;
-
+	if(!firing_range)
+		if (entity_team < 0 || entity_team>50 || entity_team == team_player) return;
+	
+	
 	//Vis check aiming? dunno
 	if(aim==2)
 	{
@@ -400,14 +287,11 @@ void ProcessPlayer(Entity& LPlayer, Entity& target, uint64_t entitylist, int ind
 			tmp_aimentity = target.ptr;
 		}
 	}
-
-	SetPlayerGlow(LPlayer, target, index);
-
 	lastvis_aim[index] = target.lastVisTime();
 }
 
 
-
+//Main stuff, dont edit.
 void DoActions()
 {
 	actions_t = true;
@@ -461,11 +345,13 @@ void DoActions()
 			{
 				continue;
 			}
-
+			
+			
+			//Dont edit.
 			max = 999.0f;
+			tmp_aimentity = 0;
 			tmp_spec = 0;
 			tmp_all_spec = 0;
-			tmp_aimentity = 0;
 			if(firing_range)
 			{
 				int c=0;
@@ -478,7 +364,7 @@ void DoActions()
 					if (LocalPlayer == centity) continue;
 
 					Entity Target = getEntity(centity);
-					if (!Target.isDummy()) //&& !target_allies
+					if (!Target.isDummy())
 					{
 						continue;
 					}
@@ -511,44 +397,15 @@ void DoActions()
 						continue;
 					}
 					
-//					ProcessPlayer(LPlayer, Target, entitylist, i);
+					ProcessPlayer(LPlayer, Target, entitylist, i);
 
 					int entity_team = Target.getTeamId();
-					if (!target_allies &&(entity_team == team_player))
+					if (entity_team == team_player)
 					{
 						continue;
 					}
 
-
-					switch (safe_level)
-					{
-					case 1:
-						if (spectators > 0)
-						{
-							if(Target.isGlowing())
-							{
-								Target.disableGlow();
-							}
-							continue;
-						}
-						break;
-					case 2:
-						if (spectators + allied_spectators > 0)
-						{
-							if(Target.isGlowing())
-							{
-								Target.disableGlow();
-							}
-							continue;
-						}
-						break;
-					default:
-						break;
-					}
-
-					ProcessPlayer(LPlayer, Target, entitylist, i);
-
-					if(player_glow && !Target.isGlowing()) //new stuff , but this logic is in the previous session about safetylevel
+					if(player_glow && !Target.isGlowing())
 					{
 						Target.enableGlow();
 					}
@@ -601,9 +458,9 @@ void DoActions()
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-player players[toRead]; //used for store player info in esp
+player players[toRead];
 
-
+//ESP loop.. this helps right?
 static void EspLoop()
 {
 	esp_t = true;
@@ -655,6 +512,7 @@ static void EspLoop()
 				if(firing_range)
 				{
 					int c=0;
+					//Ammount of ents to loop, dont edit.
 					for (int i = 0; i < 10000; i++)
 					{
 						uint64_t centity = 0;
@@ -828,7 +686,7 @@ static void EspLoop()
 	}
 	esp_t = false;
 }
-
+//Aimbot Loop stuff
 static void AimbotLoop()
 {
 	aim_t = true;
@@ -840,24 +698,6 @@ static void AimbotLoop()
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			if (aim>0)
 			{
-				switch (safe_level)
-				{
-				case 1:
-					if (spectators > 0)
-					{
-						continue;
-					}
-					break;
-				case 2:
-					if (spectators+allied_spectators > 0)
-					{
-						continue;
-					}
-					break;
-				default:
-					break;
-				}
-				
 				if (aimentity == 0 || !aiming)
 				{
 					lock=false;
@@ -870,53 +710,7 @@ static void AimbotLoop()
 				apex_mem.Read<uint64_t>(g_Base + OFFSET_LOCAL_ENT, LocalPlayer);
 				if (LocalPlayer == 0) continue;
 				Entity LPlayer = getEntity(LocalPlayer);
-				Entity target = getEntity(aimentity);
-
-				if (firing_range)
-				{
-					if (!target.isAlive())
-					{
-						continue;
-					}
-				}
-				else
-				{
-					if (!target.isAlive() || target.isKnocked())
-					{
-						continue;
-					}
-				}
-
-				Vector EntityPosition = target.getPosition();
-				Vector LocalPlayerPosition = LPlayer.getPosition();
-				float dist = LocalPlayerPosition.DistTo(EntityPosition);
-
-				if (dist> 25*40)
-				{
-					//printf("dist: bigger than 25\t");
-					dynamicsmooth = smooth;
-					dynamicmax_fov = max_fov;
-
-				}
-				else if (dist <=25*40 && dist >10*40)
-				{
-					//printf("dist: 10 to 25\t");
-					dynamicsmooth = smooth * 1.5f;
-					dynamicmax_fov = max_fov * 2.0f;
-				}
-				else if (dist <= 10 * 40)
-				{
-					//printf("dist: smaller than 10");
-					dynamicsmooth = smooth * 2.0f;
-					dynamicmax_fov = max_fov * 4.0f;
-
-				}
-				//printf("dist:\t");
-				//printf("%f\n", dist);
-
-
-//				Vector Angles = CalculateBestBoneAim(LPlayer, target, dynamicmax_fov, bone, dynamicsmooth, aim_no_recoil);
-				QAngle Angles = CalculateBestBoneAim(LPlayer, aimentity, dynamicmax_fov, bone, dynamicsmooth, aim_no_recoil);
+				QAngle Angles = CalculateBestBoneAim(LPlayer, aimentity, max_fov);
 				if (Angles.x == 0 && Angles.y == 0)
 				{
 					lock=false;
@@ -929,97 +723,10 @@ static void AimbotLoop()
 	}
 	aim_t = false;
 }
-
-static void PrintVarsToConsole() {
-	printf("\n Spectators\t\t\t\t\t\t\t     Glow\n");
-	printf("Enemy  Ally   Smooth\t   Aimbot\t     If Spectators\t Items  Players\n");
-
-	// spectators
-	printf(" %d\t%d\t", spectators, allied_spectators);
-
-	// smooth
-	printf("%d\t", smooth);
-
-	// aim definition
-	switch (aim)
-	{
-	case 0:
-		printf("OFF\t\t\t");
-		break;
-	case 1:
-		printf("ON - No Vis-check    ");
-		break;
-	case 2:
-		printf("ON - Vis-check       ");
-		break;
-	default:
-		printf("--\t\t\t");
-		break;
-	}
-
-	// safe level definition
-	switch (safe_level)
-	{
-	case 0:
-		printf("Keep ON\t\t");
-		break;
-	case 1:
-		printf("OFF with enemy\t");
-		break;
-	case 2:
-		printf("OFF with any\t");
-		break;
-	default:
-		printf("--\t\t");
-		break;
-	}
-	
-	// glow items + key
-	printf((item_glow ? "  ON\t" : "  OFF\t"));
-
-	// glow players + key
-	switch (player_glow)
-	{
-	case 0:
-		printf("  OFF\t");
-		break;
-	case 1:
-		printf("ON - without walls\t");
-		break;
-	case 2:
-		printf("ON - with walls\t");
-		break;
-	default:
-		printf("  --\t");
-		break;
-	}
-
-	// new string
-	printf("\nFiring Range\tTarget Allies\tNo-recoil    Max Distance\n");
-
-	// firing range + key
-	printf((firing_range ? "   ON\t\t" : "   OFF\t\t"));
-
-	// target allies + key
-	printf((target_allies ? "   ON\t" : "   OFF\t"));
-
-	// recoil + key
-	if (!aim_no_recoil) {
-        printf("\t  OFF\t");
-    }
-    else
-    {
-        printf("\t  ON\t");
-	}
-
-
-	// distance
-	printf("\t%d\n\n", (int)max_dist);
-}
-
+//Client memory vars/reads. HAVE to match windows client numbers.
 static void set_vars(uint64_t add_addr)
 {
-	printf("Reading client vars...\n");
+	printf("Reading the client vars...\n");
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	//Get addresses of client vars
 	uint64_t check_addr = 0;
@@ -1057,7 +764,7 @@ static void set_vars(uint64_t add_addr)
 	uint64_t spectators_addr = 0;
 	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*16, spectators_addr);
 	uint64_t allied_spectators_addr = 0;
-	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*17, allied_spectators_addr); //todo need to know what is target_allies_addr at 14
+	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*17, allied_spectators_addr);
 	uint64_t glowr_addr = 0;
 	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*18, glowr_addr);
 	uint64_t glowg_addr = 0;
@@ -1207,7 +914,7 @@ static void set_vars(uint64_t add_addr)
 	uint64_t itemglowbrightness_addr = 0;
 	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*91, itemglowbrightness_addr);
 	
-
+	//good god 91 of em.. why
 	
 
 	uint32_t check = 0;
@@ -1215,13 +922,12 @@ static void set_vars(uint64_t add_addr)
 	
 	if(check != 0xABCD)
 	{
+		//Add offset msg
 		printf("Incorrect values read. Check if the add_off is correct. Quitting.\n");
 		active = false;
 		return;
 	}
 	vars_t = true;
-	auto nextUpdateTime = std::chrono::system_clock::now() + std::chrono::seconds(5);//console timeout control
-
 	while(vars_t)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -1233,6 +939,7 @@ static void set_vars(uint64_t add_addr)
 
 		while(c_Base!=0 && g_Base!=0)
 		{
+			//same as above, has to match with eveything else
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			client_mem.Write<uint64_t>(g_Base_addr, g_Base);
 			client_mem.Write<int>(spectators_addr, spectators);
@@ -1242,12 +949,9 @@ static void set_vars(uint64_t add_addr)
 			client_mem.Read<bool>(aiming_addr, aiming);
 			client_mem.Read<float>(max_dist_addr, max_dist);
 			client_mem.Read<bool>(item_glow_addr, item_glow);
-//			client_mem.Read<bool>(player_glow_addr, player_glow);
-//			client_mem.Read<bool>(aim_no_recoil_addr, aim_no_recoil);
-//			client_mem.Read<float>(smooth_addr, smooth);
-			client_mem.Read<int>(player_glow_addr, player_glow);
+			client_mem.Read<bool>(player_glow_addr, player_glow);
 			client_mem.Read<bool>(aim_no_recoil_addr, aim_no_recoil);
-			client_mem.Read<int>(smooth_addr, smooth);
+			client_mem.Read<float>(smooth_addr, smooth);
 			client_mem.Read<float>(max_fov_addr, max_fov);
 			client_mem.Read<int>(bone_addr, bone);
 			client_mem.Read<bool>(thirdperson_addr, thirdperson);
@@ -1323,8 +1027,9 @@ static void set_vars(uint64_t add_addr)
 			client_mem.Read<bool>(weapon_3030_repeater_addr, weapon_3030_repeater);
 			client_mem.Read<bool>(weapon_rampage_addr, weapon_rampage);
 			client_mem.Read<bool>(weapon_car_smg_addr, weapon_car_smg);
-			client_mem.Read<float>(aimdist_addr, max_dist);
+			client_mem.Read<float>(aimdist_addr, aimdist);
 			client_mem.Read<int>(itemglowbrightness_addr, itemglowbrightness);
+
 
 			if(esp && next2)
 			{
@@ -1341,21 +1046,16 @@ static void set_vars(uint64_t add_addr)
 				} while (next2_val && g_Base!=0 && c_Base!=0);
 				
 				next2 = false;
-
-			if (nextUpdateTime < std::chrono::system_clock::now()) { // printing data to console timeout
-				PrintVarsToConsole();
-				nextUpdateTime = std::chrono::system_clock::now() + std::chrono::seconds(5);
 			}
 		}
 	}
 	vars_t = false;
 }
-}
 
-//// Item Glow Stuff // this is relocated into the game.h
-//struct GlowMode {
-//	int8_t GeneralGlowMode, BorderGlowMode, BorderSize, TransparentLevel;
-//};
+// Item Glow Stuff
+struct GlowMode {
+	int8_t GeneralGlowMode, BorderGlowMode, BorderSize, TransparentLevel;
+};
  
 static void item_glow_t()
 {
@@ -1370,7 +1070,8 @@ static void item_glow_t()
 			uint64_t entitylist = g_Base + OFFSET_ENTITYLIST;
 			if (item_glow)
 			{
-				for (int i = 0; i < 20000; i++)
+				//item ENTs to loop, 10k-15k is normal. 10k might be better but will not show all the death boxes i think.
+				for (int i = 0; i < 15000; i++)
 				{
 					uint64_t centity = 0;
 					apex_mem.Read<uint64_t>(entitylist + ((uint64_t)i << 5), centity);
@@ -2108,13 +1809,14 @@ static void item_glow_t()
 				}
 				k=1;
 				//Change the 60 ms to lower to make the death boxes filker less.
-				std::this_thread::sleep_for(std::chrono::milliseconds(600));
+				std::this_thread::sleep_for(std::chrono::milliseconds(60));
 			}
 			else
 			{		
 				if(k==1)
 				{
-					for (int i = 0; i < 20000; i++)
+					//same and the ents above to turn the glow off
+					for (int i = 0; i < 15000; i++)
 					{
 						uint64_t centity = 0;
 						apex_mem.Read<uint64_t>(entitylist + ((uint64_t)i << 5), centity);
@@ -2140,6 +1842,7 @@ int main(int argc, char *argv[])
 {
 	if(geteuid() != 0)
 	{
+		//run as root..
 		printf("Error: %s is not running as root\n", argv[0]);
 		return 0;
 	}
@@ -2149,7 +1852,7 @@ int main(int argc, char *argv[])
 	//const char* ap_proc = "EasyAntiCheat_launcher.exe";
 
 	//Client "add" offset
-	uint64_t add_off = 0x1409a0;
+	uint64_t add_off = 0x1399c0; //todo make this auto update..
 
 	std::thread aimbot_thr;
 	std::thread esp_thr;

@@ -53,7 +53,7 @@ bool aim_no_recoil = true;
 bool aiming = false; //read
 uint64_t g_Base = 0; //write
 float max_dist = 3800.0f * 40.0f; //read //Max Distance of ESP 3800 is full map
-int smooth = 50; //Min 100 for safe aimbotting
+float smooth = 110.0f; //Min 100 for safe aimbotting
 float max_fov = 15.0f; //15 is the sweetspot for 1080p
 // Dynamic Fov
 float dynamicfov = 10;
@@ -152,7 +152,7 @@ bool weapon_car_smg = false;
 // Aim distance check
 float aimdist = 9905.0f;
 //item glow brightness
-int itemglowbrightness = 10;
+int itemglowbrightness = 9;
 
 
 bool thirdperson = false;
@@ -176,6 +176,7 @@ bool k_f20 = 0;
 bool k_f100 = 0;
 
 player players[100];
+
 
 void randomBone() {
 	int boneArray[2] = { 1, 2 };
@@ -239,9 +240,9 @@ typedef struct
 	DWORD B;
 	DWORD A;
 }RGBA;
-//static void FilledRectangle(int x, int y, int w, int h, RGBA color)
+//static void FilledRectangle(int x, int y, int w, int h, RGBA color) //USED TO BE COMMENTED
 //{
-//	ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(x, y), ImVec2(x + w, y + h), ImGui::ColorConvertFloat4ToU32(ImVec4(color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0)), 0, 0);
+	//ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(x, y), ImVec2(x + w, y + h), ImGui::ColorConvertFloat4ToU32(ImVec4(color.R / 255.0, color.G / 255.0, color.B / 255.0, color.A / 255.0)), 0, 0);
 //}
 
 //Color Team Radar Test. oh god why... This is stupid.. dont do this.. it works tho
@@ -343,8 +344,8 @@ namespace RadarSettings
 	bool teamRadar = true;
 	bool enemyRadar = true;
 	int xAxis_Radar = 0;
-	int yAxis_Radar = 400;
-	int radartype = 0;
+	int yAxis_Radar = 400; //400
+	int radartype = 0; 
 	int width_Radar = 400;
 	int height_Radar = 400;
 	int distance_Radar = 250;
@@ -466,10 +467,10 @@ void MiniMapRadar(D3DXVECTOR3 EneamyPos, D3DXVECTOR3 LocalPos, float LocalPlayer
 	//Radar Window Flags: No Move, Resize, Title bar, Background etc. makes it so you can change it once set.
 
 	//slash out  | ImGuiWindowFlags_::ImGuiWindowFlags_NoMove to move the minimap
-	TargetFlags = ImGuiWindowFlags_::ImGuiWindowFlags_NoResize | ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_::ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
+	TargetFlags = ImGuiWindowFlags_::ImGuiWindowFlags_NoResize | ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_::ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar; //| ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
 	if (!firstS) //dunno
 	{
-		ImGui::SetNextWindowPos(ImVec2{ 1200, 60 }, ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2{ 1200, 60 }, ImGuiCond_Once); //used to be 1200,60 too far down and to the left
 		firstS = true;
 	}
 	
@@ -485,8 +486,8 @@ void MiniMapRadar(D3DXVECTOR3 EneamyPos, D3DXVECTOR3 LocalPos, float LocalPlayer
 			ImVec2 midRadar = ImVec2(DrawPos.x + (DrawSize.x / 2), DrawPos.y + (DrawSize.y / 2));
 
 			//unslash to set to minimap, it helps line it up //USED TO BE COMMENTED
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(midRadar.x - DrawSize.x / 2.f, midRadar.y), ImVec2(midRadar.x + DrawSize.x / 2.f, midRadar.y), IM_COL32(255, 255, 255, 255));
-			ImGui::GetWindowDrawList()->AddLine(ImVec2(midRadar.x, midRadar.y - DrawSize.y / 2.f), ImVec2(midRadar.x, midRadar.y + DrawSize.y / 2.f), IM_COL32(255, 255, 255, 255));
+			//ImGui::GetWindowDrawList()->AddLine(ImVec2(midRadar.x - DrawSize.x / 2.f, midRadar.y), ImVec2(midRadar.x + DrawSize.x / 2.f, midRadar.y), IM_COL32(255, 255, 255, 255));
+			//ImGui::GetWindowDrawList()->AddLine(ImVec2(midRadar.x, midRadar.y - DrawSize.y / 2.f), ImVec2(midRadar.x, midRadar.y + DrawSize.y / 2.f), IM_COL32(255, 255, 255, 255));
 
 			DrawRadarPoint(EneamyPos, LocalPos, LocalPlayerY, eneamyDist, TeamId, DrawPos.x, DrawPos.y, DrawSize.x, DrawSize.y, { 255, 255, 255, 255 });
 		}
@@ -1080,8 +1081,8 @@ int main(int argc, char** argv)
 	}
 	ready = false;
 	ov1.Clear();
-	if (use_nvidia)
-		system(XorStr("taskkill /T /IM \"NVIDIA Share.exe\" /F")); //custom overlay process name
+	if (!use_nvidia)
+		system(XorStr("taskkill /F /T /IM Stragulum.exe")); //custom overlay process name
 	return 0;
 }
 

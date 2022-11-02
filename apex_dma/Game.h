@@ -15,22 +15,6 @@ typedef struct Bone
 	float z;
 }Bone;
 
-struct GColor //todo old codebase
-{
-    float r, g, b;
-};
-
-struct GlowMode //todo old codebase
-{
-    int8_t GeneralGlowMode, BorderGlowMode, BorderSize, TransparentLevel;
-};
-
-struct Fade //todo old codebase
-{
-    int a, b;
-    float c, d, e, f;
-};
-
 class Entity
 {
 public:
@@ -58,7 +42,6 @@ public:
 	float GetYaw();
 
 	void enableGlow();
-	void enableGlow(GColor color); //todo old code base
 	void disableGlow();
 	void SetViewAngles(SVector angles);
 	void SetViewAngles(QAngle& angles);
@@ -115,6 +98,6 @@ Item getItem(uintptr_t ptr);
 
 bool WorldToScreen(Vector from, float* m_vMatrix, int targetWidth, int targetHeight, Vector& to);
 float CalculateFov(Entity& from, Entity& target);
-QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, int bone, int smooth, bool aim_no_recoil);
+QAngle CalculateBestBoneAim(Entity& from, uintptr_t target, float max_fov);
 void get_class_name(uint64_t entity_ptr, char* out_str);
 void charge_rifle_hack(uint64_t entity_ptr);

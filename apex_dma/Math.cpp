@@ -1,7 +1,5 @@
 #include "Math.h"
 
-#define DegToRad(val1) ((val1 * M_PI) / 180)
-
 void Math::NormalizeAngles(QAngle& angle)
 {
 	while (angle.x > 89.0f)
@@ -30,15 +28,6 @@ QAngle Math::CalcAngle(const Vector& src, const Vector& dst)
 	if (delta.x >= 0.0) angle.y += 180.0f;
 
 	return angle;
-}
-
-double Math::GetFov_old(const QAngle& viewAngle, const QAngle& aimAngle, float distance) { //not in use , can be removed
-	QAngle delta = aimAngle - viewAngle;
-	NormalizeAngles(delta);
-	float pitch = (float)sin(DegToRad(delta.x)) * distance;
-	float yaw = (float)sin(DegToRad(delta.y)) * distance;
-
-	return sqrt(powf(pitch, 2.0) + powf(yaw, 2.0));
 }
 
 double Math::GetFov(const QAngle& viewAngle, const QAngle& aimAngle)
