@@ -53,7 +53,7 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(DXSDK_DIR)Lib\x64;$(LibraryPath)</LibraryPath>
     <IncludePath>$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
-    <TargetName>MonkeyCure</TargetName>
+    <TargetName>boxsecclient</TargetName>
     <ManagedAssembly>true</ManagedAssembly>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
