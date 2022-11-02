@@ -46,6 +46,7 @@ bool ready = false;
 extern visuals v;
 int aim = 2; //read
 bool esp = true; //read
+bool visglow = true; //read
 bool item_glow = true;
 bool player_glow = true;
 bool aim_no_recoil = true;
@@ -175,6 +176,13 @@ bool k_f20 = 0;
 bool k_f100 = 0;
 
 player players[100];
+
+void randomBone() {
+	int boneArray[2] = { 1, 2 };
+	int randVal = rand() % 2;
+	bone = boneArray[randVal];
+	Sleep(1250);
+}
 
 //Radar Code
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
@@ -469,16 +477,16 @@ void MiniMapRadar(D3DXVECTOR3 EneamyPos, D3DXVECTOR3 LocalPos, float LocalPlayer
 	{
 		ImGui::SetNextWindowSize({ 250, 250 });
 		ImGui::Begin(("Radar"), 0, TargetFlags);
-		//if (ImGui::Begin(xorstr("Radar", 0, ImVec2(200, 200), -1.f, TargetFlags))) {
+		//if (ImGui::Begin(XorStr("Radar", 0, ImVec2(200, 200), -1.f, TargetFlags))) {
 		{
 			ImDrawList* Draw = ImGui::GetWindowDrawList();
 			ImVec2 DrawPos = ImGui::GetCursorScreenPos();
 			ImVec2 DrawSize = ImGui::GetContentRegionAvail();
 			ImVec2 midRadar = ImVec2(DrawPos.x + (DrawSize.x / 2), DrawPos.y + (DrawSize.y / 2));
 
-			//unslash to set to minimap, it helps line it up
-			//ImGui::GetWindowDrawList()->AddLine(ImVec2(midRadar.x - DrawSize.x / 2.f, midRadar.y), ImVec2(midRadar.x + DrawSize.x / 2.f, midRadar.y), IM_COL32(255, 255, 255, 255));
-			//ImGui::GetWindowDrawList()->AddLine(ImVec2(midRadar.x, midRadar.y - DrawSize.y / 2.f), ImVec2(midRadar.x, midRadar.y + DrawSize.y / 2.f), IM_COL32(255, 255, 255, 255));
+			//unslash to set to minimap, it helps line it up //USED TO BE COMMENTED
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(midRadar.x - DrawSize.x / 2.f, midRadar.y), ImVec2(midRadar.x + DrawSize.x / 2.f, midRadar.y), IM_COL32(255, 255, 255, 255));
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(midRadar.x, midRadar.y - DrawSize.y / 2.f), ImVec2(midRadar.x, midRadar.y + DrawSize.y / 2.f), IM_COL32(255, 255, 255, 255));
 
 			DrawRadarPoint(EneamyPos, LocalPos, LocalPlayerY, eneamyDist, TeamId, DrawPos.x, DrawPos.y, DrawSize.x, DrawSize.y, { 255, 255, 255, 255 });
 		}
@@ -690,7 +698,21 @@ void Overlay::RenderEsp()
 				{
 					std::string distance = std::to_string(players[i].dist / 39.62);
 					distance = distance.substr(0, distance.find('.')) + "m(" + std::to_string(players[i].entity_team) + ")";
-
+					//Draws Box for Box ESP Option
+					if (v.box)
+					{
+						if (players[i].visible)
+						{
+							if (players[i].dist < 1600.0f)
+								DrawBox(RED, players[i].boxMiddle, players[i].h_y, players[i].width, players[i].height); //BOX
+							else
+								DrawBox(ORANGE, players[i].boxMiddle, players[i].h_y, players[i].width, players[i].height); //BOX
+						}
+						else
+						{
+							DrawBox(WHITE, players[i].boxMiddle, players[i].h_y, players[i].width, players[i].height); //white if player not visible
+						}
+					}
 					float radardistance = (int)((players[i].LocalPlayerPosition, players[i].dist) / 39.62);
 					//Dynamic FOV
 					if (players[i].dist / 39.62 < dynamicfovmax)
@@ -706,17 +728,35 @@ void Overlay::RenderEsp()
 					{
 							MiniMapRadar(players[i].EntityPosition, players[i].LocalPlayerPosition, players[i].localviewangle.y, radardistance, players[i].entity_team);
 					}
+					//Draws a colored line from you to an enemy and changes color based on visability
 					if (v.line)
-						DrawLine(ImVec2((float)(getWidth() / 2), (float)getHeight()), ImVec2(players[i].b_x, players[i].b_y), BLUE, 1); //LINE FROM MIDDLE SCREEN
-
+					{
+						if (players[i].visible)
+						{
+							if (players[i].dist < 1600.0f)
+							{
+								DrawLine(ImVec2((float)(getWidth() / 2), (float)getHeight()), ImVec2(players[i].b_x, players[i].b_y), RED, 1); //Line in the middle of screen
+							}
+							else
+							{
+								DrawLine(ImVec2((float)(getWidth() / 2), (float)getHeight()), ImVec2(players[i].b_x, players[i].b_y), ORANGE, 1); //Line in the middle of screen
+							}
+						}
+						else
+						{
+							//DrawLine(ImVec2((float)(getWidth() / 2), (float)getHeight()), ImVec2(players[i].b_x, players[i].b_y), WHITE, 1); //Line in the middle of screen
+						}
+					}
+					//Shows distance in meters from enemy player
 					if (v.distance)
 					{
 						if (players[i].knocked)
 							String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), RED, distance.c_str());  //DISTANCEs			else
 							String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), GREEN, distance.c_str());  //DISTANCE
 					}
+					//Draws Seer Q ESP
 					if (v.healthbar)
-						if (players[i].dist < 12000.0f)
+						if (players[i].dist < 16000.0f)
 						{
 
 							DrawSeerLikeHealth((players[i].b_x - (players[i].width / 2.0f) + 5), (players[i].b_y - players[i].height - 10), players[i].shield, players[i].maxshield, players[i].armortype, players[i].health); //health bar					
@@ -725,14 +765,16 @@ void Overlay::RenderEsp()
 					if (mainradarmap == true)
 
 						worldToScreenMap(players[i].EntityPosition, players[i].entity_team);
-
-						//String(ImVec2(players[i].boxMiddle, (players[i].b_y - players[i].height - 15)), WHITE, players[i].name);
+					//Displays enemy players name
+					if (v.name)
+						String(ImVec2(players[i].boxMiddle, (players[i].b_y - players[i].height - 15)), WHITE, players[i].name);
 				}
 			}
 			ImGui::End();
 		}
 	}
 }
+
 
 int main(int argc, char** argv)
 {
@@ -889,6 +931,9 @@ int main(int argc, char** argv)
 				config >> v.healthbar;
 				config >> v.shieldbar;
 				config >> v.distance;
+				config >> v.line;
+				config >> v.box;
+				config >> v.name;
 				config >> thirdperson;
 				config >> minimapradar;
 				config >> lightbackpack;
@@ -1022,6 +1067,7 @@ int main(int argc, char** argv)
 		if (IsKeyDown(aim_key) && toggleaim)
 		{
 			aiming = true;
+			randomBone();
 		}
 
 		else if (IsKeyDown(aim_key2) && toggleaim2)
