@@ -826,7 +826,7 @@ int main(int argc, char *argv[])
 	//const char* ap_proc = "EasyAntiCheat_launcher.exe";
 
 	//Client "add" offset
-	uint64_t add_off = 0x40d0;
+	uint64_t add_off = 0xa0d0;
 	
 	// start external terminal and open pipe to print to it
 	if (DEBUG_PRINT) {
