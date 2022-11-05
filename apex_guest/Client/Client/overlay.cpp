@@ -17,7 +17,7 @@ extern bool aim_no_recoil;
 extern bool ready;
 extern bool use_nvidia;
 extern float max_dist;
-extern float smooth;
+extern int smooth;
 extern float max_fov;
 //Dynamic Fov
 extern float dynamicfov;
@@ -303,8 +303,8 @@ void Overlay::RenderMenu()
 					ImGui::Dummy(ImVec2(0.0f, 10.0f));
 					ImGui::Text(XorStr("Smooth Aim Value:"));
 					ImGui::SameLine();
-					ImGui::TextColored(GREEN, "%.f", smooth);
-					ImGui::SliderFloat(XorStr("##2"), &smooth, 85.0f, 150.0f, "##");
+					ImGui::TextColored(GREEN, "%d", smooth);
+					ImGui::SliderInt(XorStr("##2"), &smooth, 85, 150, "##");
 					ImGui::SameLine();
 					ImGui::Text(XorStr("85 To 100 Is Safe"));
 					ImGui::Dummy(ImVec2(0.0f, 10.0f));
