@@ -65,6 +65,17 @@ float glowr = 120.0f; //Red Value
 float glowg = 0.0f; //Green Value
 float glowb = 0.0f; //Blue Value
 float glowcolor[3] = { 000.0f, 000.0f, 000.0f };
+//more glow stuff
+//glow visable
+float glowrviz = 50.0f;
+float glowgviz = 50.0f;
+float glowbviz = 50.0f;
+float glowcolorviz[3] = { 000.0f, 000.0f, 000.0f };
+//knocked
+float glowrknocked = 50.0f;
+float glowgknocked = 50.0f;
+float glowbknocked = 50.0f;
+float glowcolorknocked[3] = { 000.0f, 000.0f, 000.0f };
 extern int minimapradardotsize1;
 extern int minimapradardotsize2;
 bool minimapradar = false;
@@ -161,7 +172,7 @@ int allied_spectators = 0; //write
 bool valid = true; //write
 bool next2 = true; //read write
 
-uint64_t add[92];
+uint64_t add[98];
 
 bool k_f5 = 0;
 bool k_f6 = 0;
@@ -533,7 +544,7 @@ world KingsCanyon(ImVec2(25223.177734, 28906.144531), ImVec2(1197, 185), ImVec2(
 world WorldsEdge(ImVec2(-9190.608398, 8443.554688), ImVec2(824, 412), ImVec2(-19529.794922, -8933.173828), ImVec2(707, 608));
 world Olympus(ImVec2(0, 0), ImVec2(0, 0), ImVec2(0, 0), ImVec2(0, 0)); //to be measured
 // 1080p   world StormPoint(ImVec2(-21264.427734, -47086.878906), ImVec2(711, 983), ImVec2(40298.070313, 21163.728516), ImVec2(1321, 306));
-
+world  BrokenMoon(ImVec2(14532.587891, 19858.138672), ImVec2(1122, 278), ImVec2(-15746.124023, -14393.649414), ImVec2(764, 683));
 // 1440p   world StormPoint(ImVec2(-21264.427734, -47086.878906), ImVec2(948, 1310), ImVec2(40298.070313, 21163.728516), ImVec2(1761, 306));
 world StormPoint(ImVec2(-21264.427734, -47086.878906), ImVec2(711, 983), ImVec2(40298.070313, 21163.728516), ImVec2(1321, 306));
 //Arena
@@ -557,10 +568,10 @@ ImVec2 worldToScreenMap(D3DXVECTOR3 origin, int TeamID) {
 		}
 		*/
 		if (stormpoint == true) { //Storm Point
-			ratioX = StormPoint.ratioX;
-			ratioY = StormPoint.ratioY;
-			w1 = StormPoint.w1;
-			s1 = StormPoint.s1;
+			ratioX = BrokenMoon.ratioX;
+			ratioY = BrokenMoon.ratioY;
+			w1 = BrokenMoon.w1;
+			s1 = BrokenMoon.s1;
 		}
 		
 		else {
@@ -870,9 +881,17 @@ int main(int argc, char** argv)
 	add[89] = (uintptr_t)&weapon_car_smg;
 	add[90] = (uintptr_t)&aimdist;
 	add[91] = (uintptr_t)&itemglowbrightness;
+	//glow visable
+	add[92] = (uintptr_t)&glowrviz;
+	add[93] = (uintptr_t)&glowgviz;
+	add[94] = (uintptr_t)&glowbviz;
+	//knocked
+	add[95] = (uintptr_t)&glowrknocked;
+	add[96] = (uintptr_t)&glowgknocked;
+	add[97] = (uintptr_t)&glowbknocked;
 
 	
-	printf(XorStr("Game Version v3.0.12.19 |-| Dynamic Fov Test |-| Add me offset: 0x%I64x\n"), (uint64_t)&add[0] - (uint64_t)GetModuleHandle(NULL));
+	printf(XorStr("Game Version v3.0.15.37 |-| Stuff |-| Add me offset: 0x%I64x\n"), (uint64_t)&add[0] - (uint64_t)GetModuleHandle(NULL));
 
 	Overlay ov1 = Overlay();
 	ov1.Start();
@@ -1017,6 +1036,20 @@ int main(int argc, char** argv)
 				config >> dynamicfov;
 				config >> dynamicfovmax;
 				config >> max_fov2;
+				//glow visable
+				config >> glowrviz;
+				config >> glowgviz;
+				config >> glowbviz;
+				config >> glowcolorviz[0];
+				config >> glowcolorviz[1];
+				config >> glowcolorviz[2];
+				//glow knocked
+				config >> glowrknocked;
+				config >> glowgknocked;
+				config >> glowbknocked;
+				config >> glowcolorknocked[0];
+				config >> glowcolorknocked[1];
+				config >> glowcolorknocked[2];
 				config.close();
 			}
 		}

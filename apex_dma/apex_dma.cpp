@@ -64,6 +64,14 @@ bool thirdPerson = false;
 float glowr = 0.0f; //Red 0-255, higher is brighter color.
 float glowg = 120.0f; //Green 0-255, higher is brighter color.
 float glowb = 120.0f; //Blue 0-255, higher is brighter color.
+//visable
+float glowrviz = 0.0f; //Red 0-255, higher is brighter color.
+float glowgviz = 120.0f; //Green 0-255, higher is brighter color.
+float glowbviz = 120.0f; //Blue 0-255, higher is brighter color.
+//knocked
+float glowrknocked = 0.0f; //Red 0-255, higher is brighter color.
+float glowgknocked = 120.0f; //Green 0-255, higher is brighter color.
+float glowbknocked = 120.0f; //Blue 0-255, higher is brighter color.
 
 
 //Removed but not all the way, dont edit.
@@ -159,7 +167,7 @@ bool weapon_volt  = false;
 //Heavy Weapons
 bool weapon_flatline = false;
 bool weapon_hemlock  = false;
-bool weapon_3030_repeater = false;
+bool weapon_3030_repeater = false; 
 bool weapon_rampage  = false;
 bool weapon_car_smg  = false;
 
@@ -182,7 +190,8 @@ bool weapon_sentinel  = false;
 bool weapon_bow  = false;
 
 
-
+//aim dist check. Just setting things up, dont edit.
+float aimdist = 200.0f * 40.0f;
 
 
 //item glow brightness. Just setting things up, dont edit.
@@ -200,6 +209,7 @@ uint64_t c_Base;
 bool next2 = false;
 bool valid = false;
 bool lock = false;
+
 
 
 //Player Definitions, dont edit unless you know what you are doing.
@@ -261,11 +271,11 @@ void SetPlayerGlow(Entity& LPlayer, Entity& Target, int index)
 					}
 					else if (!(firing_range) && (Target.isKnocked() || !Target.isAlive()))
 					{
-						color = { 3.f, 3.f, 3.f };
+						color = { glowrknocked, glowgknocked, glowbknocked };
 					}
 					else if (Target.lastVisTime() > lastvis_aim[index] || (Target.lastVisTime() < 0.f && lastvis_aim[index] > 0.f))
 					{
-						color = { 0.f, 1.f, 0.f };
+						color = { glowrviz, glowgviz, glowbviz };
 					}
 					else
 					{
@@ -362,7 +372,7 @@ void ProcessPlayer(Entity& LPlayer, Entity& target, uint64_t entitylist, int ind
 
 	//Prints POS of localplayer for map cords for full map radar. only enable when adding a new map or fixing a old one, will output to console.
 	//std::printf("  X: %.6f   ||    Y:%.6f",LocalPlayerPosition.x, LocalPlayerPosition.y); //Prints x and y cords of localplayer to get mainmap radar stuff.
-
+	//if (dist > aimdist) return;
 	
 	
 	//Firing range stuff
@@ -400,9 +410,8 @@ void ProcessPlayer(Entity& LPlayer, Entity& target, uint64_t entitylist, int ind
 			tmp_aimentity = target.ptr;
 		}
 	}
-
+	
 	SetPlayerGlow(LPlayer, target, index);
-
 	lastvis_aim[index] = target.lastVisTime();
 }
 
@@ -461,11 +470,13 @@ void DoActions()
 			{
 				continue;
 			}
-
+			
+			
+			//Dont edit.
 			max = 999.0f;
+			tmp_aimentity = 0;
 			tmp_spec = 0;
 			tmp_all_spec = 0;
-			tmp_aimentity = 0;
 			if(firing_range)
 			{
 				int c=0;
@@ -511,7 +522,7 @@ void DoActions()
 						continue;
 					}
 					
-//					ProcessPlayer(LPlayer, Target, entitylist, i);
+					ProcessPlayer(LPlayer, Target, entitylist, i);
 
 					int entity_team = Target.getTeamId();
 					if (!target_allies &&(entity_team == team_player))
@@ -520,31 +531,31 @@ void DoActions()
 					}
 
 
-					switch (safe_level)
-					{
-					case 1:
-						if (spectators > 0)
-						{
-							if(Target.isGlowing())
-							{
-								Target.disableGlow();
-							}
-							continue;
-						}
-						break;
-					case 2:
-						if (spectators + allied_spectators > 0)
-						{
-							if(Target.isGlowing())
-							{
-								Target.disableGlow();
-							}
-							continue;
-						}
-						break;
-					default:
-						break;
-					}
+//					switch (safe_level) //safety level is not in use here
+//					{
+//					case 1:
+//						if (spectators > 0)
+//						{
+//							if(Target.isGlowing())
+//							{
+//								Target.disableGlow();
+//							}
+//							continue;
+//						}
+//						break;
+//					case 2:
+//						if (spectators + allied_spectators > 0)
+//						{
+//							if(Target.isGlowing())
+//							{
+//								Target.disableGlow();
+//							}
+//							continue;
+//						}
+//						break;
+//					default:
+//						break;
+//					}
 
 					ProcessPlayer(LPlayer, Target, entitylist, i);
 
@@ -840,23 +851,23 @@ static void AimbotLoop()
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			if (aim>0)
 			{
-				switch (safe_level)
-				{
-				case 1:
-					if (spectators > 0)
-					{
-						continue;
-					}
-					break;
-				case 2:
-					if (spectators+allied_spectators > 0)
-					{
-						continue;
-					}
-					break;
-				default:
-					break;
-				}
+//				switch (safe_level) //safety level not in use
+//				{
+//				case 1:
+//					if (spectators > 0)
+//					{
+//						continue;
+//					}
+//					break;
+//				case 2:
+//					if (spectators+allied_spectators > 0)
+//					{
+//						continue;
+//					}
+//					break;
+//				default:
+//					break;
+//				}
 				
 				if (aimentity == 0 || !aiming)
 				{
@@ -1206,6 +1217,23 @@ static void set_vars(uint64_t add_addr)
 	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*90, aimdist_addr);
 	uint64_t itemglowbrightness_addr = 0;
 	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*91, itemglowbrightness_addr);
+	//glow visable
+	uint64_t glowrviz_addr = 0;
+	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*92, glowrviz_addr);
+	uint64_t glowgviz_addr = 0;
+	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*93, glowgviz_addr);
+	uint64_t glowbviz_addr = 0;
+	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*94, glowbviz_addr);
+	//knocked
+	uint64_t glowrknocked_addr = 0;
+	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*95, glowrknocked_addr);
+	uint64_t glowgknocked_addr = 0;
+	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*96, glowgknocked_addr);
+	uint64_t glowbknocked_addr = 0;
+	client_mem.Read<uint64_t>(add_addr + sizeof(uint64_t)*97, glowbknocked_addr);
+	
+	
+	
 	
 
 	
@@ -1215,6 +1243,7 @@ static void set_vars(uint64_t add_addr)
 	
 	if(check != 0xABCD)
 	{
+		//Add offset msg
 		printf("Incorrect values read. Check if the add_off is correct. Quitting.\n");
 		active = false;
 		return;
@@ -1233,6 +1262,7 @@ static void set_vars(uint64_t add_addr)
 
 		while(c_Base!=0 && g_Base!=0)
 		{
+			//same as above, has to match with eveything else
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			client_mem.Write<uint64_t>(g_Base_addr, g_Base);
 			client_mem.Write<int>(spectators_addr, spectators);
@@ -1323,8 +1353,21 @@ static void set_vars(uint64_t add_addr)
 			client_mem.Read<bool>(weapon_3030_repeater_addr, weapon_3030_repeater);
 			client_mem.Read<bool>(weapon_rampage_addr, weapon_rampage);
 			client_mem.Read<bool>(weapon_car_smg_addr, weapon_car_smg);
-			client_mem.Read<float>(aimdist_addr, max_dist);
+			client_mem.Read<float>(aimdist_addr, aimdist);
 			client_mem.Read<int>(itemglowbrightness_addr, itemglowbrightness);
+			//glow visable
+			client_mem.Read<float>(glowrviz_addr, glowrviz);
+			client_mem.Read<float>(glowgviz_addr, glowgviz);
+			client_mem.Read<float>(glowbviz_addr, glowbviz);
+			//knocked
+			client_mem.Read<float>(glowrknocked_addr, glowrknocked);
+			client_mem.Read<float>(glowgknocked_addr, glowgknocked);
+			client_mem.Read<float>(glowbknocked_addr, glowbknocked);
+			
+		
+			
+	
+
 
 			if(esp && next2)
 			{
@@ -1349,7 +1392,6 @@ static void set_vars(uint64_t add_addr)
 		}
 	}
 	vars_t = false;
-}
 }
 
 //// Item Glow Stuff // this is relocated into the game.h

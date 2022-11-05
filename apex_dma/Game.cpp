@@ -7,7 +7,7 @@ extern bool firing_range;
 extern float glowr;
 extern float glowg;
 extern float glowb;
-//glowtype logic to be checked
+//todo glowtype logic to be checked
 extern int glowtype;
 extern int glowtype2;
 
@@ -154,38 +154,75 @@ Vector Entity::getBonePosition(int id) //not in use , use getBonePositionByHitbo
 //https://www.unknowncheats.me/forum/apex-legends/496984-getting-hitbox-positions-cstudiohdr-externally.html
 //https://www.unknowncheats.me/forum/3499185-post1334.html
 //hitboxes
+
+//old one
+//Vector Entity::getBonePositionByHitbox(int id)
+//{
+//	Vector origin = getPosition();
+//
+//    //BoneByHitBox
+//	uint64_t Model = *(uint64_t*)(buffer + OFFSET_STUDIOHDR);
+//
+//	//get studio hdr
+//	uint64_t StudioHdr;
+//	apex_mem.Read<uint64_t>(Model + 0x8, StudioHdr);
+//
+//    //get hitbox array
+//	int HitBoxsArray_set;
+//	apex_mem.Read<int>(StudioHdr + 0x34,HitBoxsArray_set);
+//	uint64_t HitBoxsArray = StudioHdr + HitBoxsArray_set;
+//
+//	int HitboxIndex;
+//	apex_mem.Read<int>(HitBoxsArray + 0x8, HitboxIndex);
+//
+//	int Bone;
+//	apex_mem.Read<int>(HitBoxsArray + HitboxIndex + (id * 0x0038), Bone);
+//
+//	if(Bone < 0 || Bone > 255)
+//		return Vector();
+//
+//    //hitpos
+//	uint64_t BoneArray = *(uint64_t*)(buffer + OFFSET_BONES);
+//
+//	matrix3x4_t Matrix = {};
+//	apex_mem.Read<matrix3x4_t>(BoneArray + Bone * sizeof(matrix3x4_t), Matrix);
+//
+//	return Vector(Matrix.m_flMatVal[0][3] + origin.x, Matrix.m_flMatVal[1][3] + origin.y, Matrix.m_flMatVal[2][3] + origin.z);
+//}
+
+//new one
 Vector Entity::getBonePositionByHitbox(int id)
 {
 	Vector origin = getPosition();
-
+ 
     //BoneByHitBox
 	uint64_t Model = *(uint64_t*)(buffer + OFFSET_STUDIOHDR);
-
+    
 	//get studio hdr
 	uint64_t StudioHdr;
 	apex_mem.Read<uint64_t>(Model + 0x8, StudioHdr);
-
-	//get hitbox array
+ 
+    //get hitbox array
 	uint16_t HitboxCache;
 	apex_mem.Read<uint16_t>(StudioHdr + 0x34, HitboxCache);
 	uint64_t HitboxArray = StudioHdr + ((uint16_t)(HitboxCache & 0xFFFE) << (4 * (HitboxCache & 1)));
-
+ 
 	uint16_t  IndexCache;
 	apex_mem.Read<uint16_t>(HitboxArray + 0x4, IndexCache);
 	int HitboxIndex = ((uint16_t)(IndexCache & 0xFFFE) << (4 * (IndexCache & 1)));
-
+ 
 	uint16_t  Bone;
 	apex_mem.Read<uint16_t>(HitboxIndex + HitboxArray + (id * 0x20), Bone);
-
+ 
 	if(Bone < 0 || Bone > 255)
 		return Vector();
-
-	//hitpos
+ 
+    //hitpos
 	uint64_t Bones = *(uint64_t*)(buffer + OFFSET_BONES);
-
+ 
 	matrix3x4_t Matrix = {};
 	apex_mem.Read<matrix3x4_t>(Bones + Bone * sizeof(matrix3x4_t), Matrix);
-
+ 
 	return Vector(Matrix.m_flMatVal[0][3] + origin.x, Matrix.m_flMatVal[1][3] + origin.y, Matrix.m_flMatVal[2][3] + origin.z);
 }
 
@@ -229,22 +266,15 @@ bool Entity::isZooming()
 	return *(int*)(buffer + OFFSET_ZOOMING) == 1;
 }
 //custom glow color RGB
-void Entity::enableGlow()
+void Entity::enableGlow(GColor color)
 {
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, glowtype);
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, glowtype2); //todo which one is correct ,1 or 2
-	// Color
-	apex_mem.Write<float>(ptr + GLOW_COLOR_R, glowr);
-	apex_mem.Write<float>(ptr + GLOW_COLOR_G, glowg);
-	apex_mem.Write<float>(ptr + GLOW_COLOR_B, glowb);
-}
-
-void Entity::enableGlow(GColor color) //todo old code base, which one to use
-{
+	
 	apex_mem.Write<GlowMode>(ptr + GLOW_TYPE, { 101,102,96,90 });
 	apex_mem.Write<GColor>(ptr + GLOW_COLOR, color);
 
-	float currentEntityTime = 5000.f;
+
+
+	float currentEntityTime = 5000.f; //todo check logic
 	apex_mem.Write<float>(ptr + GLOW_DISTANCE, 20000.f);
 	apex_mem.Write<float>(ptr + GLOW_LIFE_TIME, currentEntityTime);
 
@@ -253,8 +283,20 @@ void Entity::enableGlow(GColor color) //todo old code base, which one to use
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 1);
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 1);
 	apex_mem.Write<Fade>(ptr + GLOW_FADE, { 872415232, 872415232, currentEntityTime, currentEntityTime, currentEntityTime, currentEntityTime });
-}
 
+
+
+
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE_GLOW_CONTEXT, 1);//todo check logic
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS_GLOW_VISIBLE_TYPE, 2);
+	
+	//apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, glowtype);
+	//apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, glowtype2);
+	// Color
+	//apex_mem.Write<float>(ptr + GLOW_COLOR_R, glowr);
+	//apex_mem.Write<float>(ptr + GLOW_COLOR_G, glowg);
+	//apex_mem.Write<float>(ptr + GLOW_COLOR_B, glowb);
+}
 void Entity::disableGlow()
 {
 	apex_mem.Write<float>(ptr + GLOW_COLOR_R, 0.0f);
@@ -414,7 +456,7 @@ QAngle CalculateBestBoneAim(Entity& from, uintptr_t targetptr, float max_fov, in
 	QAngle ViewAngles = from.GetViewAngles();
 	QAngle SwayAngles = from.GetSwayAngles();
 	//remove sway and recoil
-	if(aim_no_recoil==true)
+	if(aim_no_recoil)
 		CalculatedAngles-=SwayAngles-ViewAngles;
 	Math::NormalizeAngles(CalculatedAngles);
 	QAngle Delta = CalculatedAngles - ViewAngles;
