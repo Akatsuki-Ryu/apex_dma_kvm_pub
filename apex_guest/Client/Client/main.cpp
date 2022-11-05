@@ -64,18 +64,18 @@ int bone = 2; //0 Head, 1 Neck, 2 Body, 3 Stomace, 4 Nuts
 float glowr = 120.0f; //Red Value
 float glowg = 0.0f; //Green Value
 float glowb = 0.0f; //Blue Value
-float glowcolor[3] = { 000.0f, 000.0f, 000.0f };
+float glowcolor[3] = { 1.0f, 000.0f, 000.0f };
 //more glow stuff
 //glow visable
 float glowrviz = 50.0f;
 float glowgviz = 50.0f;
 float glowbviz = 50.0f;
-float glowcolorviz[3] = { 000.0f, 000.0f, 000.0f };
+float glowcolorviz[3] = { 000.0f, 1.0f, 000.0f };
 //knocked
 float glowrknocked = 50.0f;
 float glowgknocked = 50.0f;
 float glowbknocked = 50.0f;
-float glowcolorknocked[3] = { 000.0f, 000.0f, 000.0f };
+float glowcolorknocked[3] = { 0.5f, 0.5f, 0.5f };
 extern int minimapradardotsize1;
 extern int minimapradardotsize2;
 bool minimapradar = false;
