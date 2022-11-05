@@ -522,7 +522,7 @@ void DoActions()
 						continue;
 					}
 					
-					ProcessPlayer(LPlayer, Target, entitylist, i);
+					//ProcessPlayer(LPlayer, Target, entitylist, i);
 
 					int entity_team = Target.getTeamId();
 					if (!target_allies &&(entity_team == team_player))
