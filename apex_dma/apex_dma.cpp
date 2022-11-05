@@ -494,14 +494,14 @@ void DoActions()
 						continue;
 					}
 
-					if(player_glow && !Target.isGlowing())
-					{
-						Target.enableGlow();
-					}
-					else if(!player_glow && Target.isGlowing())
-					{
-						Target.disableGlow();
-					}
+//					if(player_glow && !Target.isGlowing())
+//					{
+//						Target.enableGlow();
+//					}
+//					else if(!player_glow && Target.isGlowing())
+//					{
+//						Target.disableGlow();
+//					}
 
 					ProcessPlayer(LPlayer, Target, entitylist, c);
 					c++;
@@ -559,14 +559,14 @@ void DoActions()
 
 					ProcessPlayer(LPlayer, Target, entitylist, i);
 
-					if(player_glow && !Target.isGlowing()) //new stuff , but this logic is in the previous session about safetylevel
-					{
-						Target.enableGlow();
-					}
-					else if(!player_glow && Target.isGlowing())
-					{
-						Target.disableGlow();
-					}
+//					if(player_glow && !Target.isGlowing()) //new stuff , but this logic is in the previous session about safetylevel
+//					{
+//						Target.enableGlow();
+//					}
+//					else if(!player_glow && Target.isGlowing())
+//					{
+//						Target.disableGlow();
+//					}
 				}
 			}
 
