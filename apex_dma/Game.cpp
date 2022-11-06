@@ -272,16 +272,23 @@ void Entity::enableGlow(GColor color)
 	apex_mem.Write<GlowMode>(ptr + GLOW_TYPE, { 101,102,96,90 });
 	apex_mem.Write<GColor>(ptr + GLOW_COLOR, color);
 
-	float currentEntityTime = 5000.f;
+
+
+	float currentEntityTime = 5000.f; //todo check logic
 	apex_mem.Write<float>(ptr + GLOW_DISTANCE, 20000.f);
 	apex_mem.Write<float>(ptr + GLOW_LIFE_TIME, currentEntityTime);
 
 	currentEntityTime -= 1.f;
 
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_ENABLE, 1);
-	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 1);
+	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 2);
 	apex_mem.Write<Fade>(ptr + GLOW_FADE, { 872415232, 872415232, currentEntityTime, currentEntityTime, currentEntityTime, currentEntityTime });
 
+
+	// Color
+	//apex_mem.Write<float>(ptr + GLOW_COLOR_R, glowr);
+	//apex_mem.Write<float>(ptr + GLOW_COLOR_G, glowg);
+	//apex_mem.Write<float>(ptr + GLOW_COLOR_B, glowb);
 }
 void Entity::disableGlow()
 {
