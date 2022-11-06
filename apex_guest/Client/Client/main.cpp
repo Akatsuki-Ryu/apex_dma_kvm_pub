@@ -731,9 +731,16 @@ void Overlay::RenderEsp()
 					//Shows distance in meters from enemy player
 					if (v.distance)
 					{
-						if (players[i].knocked)
-							String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), RED, distance.c_str());  //DISTANCEs			else
+						if (players[i].dist < 12000.0f)
+						{
+							if (players[i].knocked)
+								String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), RED, distance.c_str());  //DISTANCE 
+						}
+						else {
 							String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), GREEN, distance.c_str());  //DISTANCE
+						}
+					
+
 					}
 					//Draws Seer Q ESP
 					if (v.healthbar)
@@ -748,7 +755,8 @@ void Overlay::RenderEsp()
 						worldToScreenMap(players[i].EntityPosition, players[i].entity_team);
 					//Displays enemy players name
 					if (v.name)
-						String(ImVec2(players[i].boxMiddle, (players[i].b_y - players[i].height - 15)), WHITE, players[i].name);
+						if (players[i].dist < 12000.0f)
+							String(ImVec2(players[i].boxMiddle, (players[i].b_y - players[i].height - 15)), WHITE, players[i].name);
 				}
 			}
 			ImGui::End();
