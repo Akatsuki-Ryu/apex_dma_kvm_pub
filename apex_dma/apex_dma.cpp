@@ -74,9 +74,6 @@ float glowgknocked = 120.0f; //Green 0-255, higher is brighter color.
 float glowbknocked = 120.0f; //Blue 0-255, higher is brighter color.
 
 
-//Removed but not all the way, dont edit.
-int glowtype = 1;
-int glowtype2 = 2;
 
 
 //Ha think i was done ?

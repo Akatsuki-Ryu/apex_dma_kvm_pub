@@ -709,21 +709,8 @@ void Overlay::RenderEsp()
 				{
 					std::string distance = std::to_string(players[i].dist / 39.62);
 					distance = distance.substr(0, distance.find('.')) + "m(" + std::to_string(players[i].entity_team) + ")";
-					//Draws Box for Box ESP Option
-					if (v.box)
-					{
-						if (players[i].visible)
-						{
-							if (players[i].dist < 1600.0f)
-								DrawBox(RED, players[i].boxMiddle, players[i].h_y, players[i].width, players[i].height); //BOX
-							else
-								DrawBox(ORANGE, players[i].boxMiddle, players[i].h_y, players[i].width, players[i].height); //BOX
-						}
-						else
-						{
-							DrawBox(WHITE, players[i].boxMiddle, players[i].h_y, players[i].width, players[i].height); //white if player not visible
-						}
-					}
+					
+
 					float radardistance = (int)((players[i].LocalPlayerPosition, players[i].dist) / 39.62);
 					//Dynamic FOV
 					if (players[i].dist / 39.62 < dynamicfovmax)
@@ -739,25 +726,8 @@ void Overlay::RenderEsp()
 					{
 							MiniMapRadar(players[i].EntityPosition, players[i].LocalPlayerPosition, players[i].localviewangle.y, radardistance, players[i].entity_team);
 					}
-					//Draws a colored line from you to an enemy and changes color based on visability
-					if (v.line)
-					{
-						if (players[i].visible)
-						{
-							if (players[i].dist < 1600.0f)
-							{
-								DrawLine(ImVec2((float)(getWidth() / 2), (float)getHeight()), ImVec2(players[i].b_x, players[i].b_y), RED, 1); //Line in the middle of screen
-							}
-							else
-							{
-								DrawLine(ImVec2((float)(getWidth() / 2), (float)getHeight()), ImVec2(players[i].b_x, players[i].b_y), ORANGE, 1); //Line in the middle of screen
-							}
-						}
-						else
-						{
-							//DrawLine(ImVec2((float)(getWidth() / 2), (float)getHeight()), ImVec2(players[i].b_x, players[i].b_y), WHITE, 1); //Line in the middle of screen
-						}
-					}
+					
+
 					//Shows distance in meters from enemy player
 					if (v.distance)
 					{
