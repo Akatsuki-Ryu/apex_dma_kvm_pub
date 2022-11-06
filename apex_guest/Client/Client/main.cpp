@@ -52,7 +52,7 @@ bool player_glow = true;
 bool aim_no_recoil = true;
 bool aiming = false; //read
 uint64_t g_Base = 0; //write
-float max_dist = 3800.0f * 40.0f; //read //Max Distance of ESP 3800 is full map
+float max_dist = 1000.0f * 40.0f; //read //Max Distance of ESP 3800 is full map
 int smooth = 50; //Min 100 for safe aimbotting
 float max_fov = 15.0f; //15 is the sweetspot for 1080p
 // Dynamic Fov
@@ -161,7 +161,7 @@ bool weapon_3030_repeater = false;
 bool weapon_rampage = false;
 bool weapon_car_smg = false;
 // Aim distance check
-float aimdist = 9905.0f;
+float aimdist = 300.0f * 40.0f;
 //item glow brightness
 int itemglowbrightness = 10;
 
@@ -192,7 +192,7 @@ void randomBone() {
 	int boneArray[2] = { 1, 2 };
 	int randVal = rand() % 2;
 	bone = boneArray[randVal];
-	Sleep(1250);
+	Sleep(50);
 }
 
 //Radar Code
@@ -737,7 +737,7 @@ void Overlay::RenderEsp()
 					}
 					//Draws Seer Q ESP
 					if (v.healthbar)
-						if (players[i].dist < 16000.0f)
+						if (players[i].dist < 12000.0f)
 						{
 
 							DrawSeerLikeHealth((players[i].b_x - (players[i].width / 2.0f) + 5), (players[i].b_y - players[i].height - 10), players[i].shield, players[i].maxshield, players[i].armortype, players[i].health); //health bar					
