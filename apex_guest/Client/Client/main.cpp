@@ -734,10 +734,12 @@ void Overlay::RenderEsp()
 						if (players[i].dist < 12000.0f)
 						{
 							if (players[i].knocked)
+							{
 								String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), RED, distance.c_str());  //DISTANCE 
-						}
-						else {
-							String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), GREEN, distance.c_str());  //DISTANCE
+							}
+							else {
+								String(ImVec2(players[i].boxMiddle, (players[i].b_y + 1)), GREEN, distance.c_str());  //DISTANCE
+							}
 						}
 					
 
