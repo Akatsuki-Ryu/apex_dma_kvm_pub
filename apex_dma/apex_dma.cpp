@@ -86,7 +86,8 @@ void SetPlayerGlow(Entity& LPlayer, Entity& Target, int index)
 					}
 					else if (Target.lastVisTime() > lastvis_aim[index] || (Target.lastVisTime() < 0.f && lastvis_aim[index] > 0.f))
 					{
-						color = { 0.f, 1.f, 0.f };
+						//color = { 0.f, 1.f, 0.f };
+						color = { 0.f, 250.f, 0.f };
 					}
 					else
 					{
