@@ -30,7 +30,7 @@ bool decSmooth_pressed = 0;
 int safe_level = 0; //read
 bool updateSafeLevel_pressed = 0;
 
-int acuracy_level = 4; //1 is low acuracy for arena , 2 is for BR , 3 is dynamic acuracy , 4 is dynamic acuracy with spectator 
+int acuracy_level = 3; //1 is low acuracy for arena , 2 is for BR , 3 is dynamic acuracy with spectator , 4 is high dynamic acuracy with spectator 
 bool updateacuracyLevel_pressed = 0;
 
 bool item_glow = true;
@@ -299,7 +299,18 @@ int main(int argc, char** argv)
 				}
 				else if (acuracy_level == 3)
 				{
-					smooth = smooth_acurate;
+					if (spectators == 0 && allied_spectators == 0)
+					{
+						player_glow = 1;
+						smooth = smooth_acurate;
+
+					}
+					else
+					{
+						player_glow = 0;
+						smooth = smooth_regular;
+						printf("spectator!! in acurate \t");
+					}
 				}
 				else if (acuracy_level == 4)
 				{
@@ -337,7 +348,17 @@ int main(int argc, char** argv)
 					}
 					else if (acuracy_level == 3)
 					{
-						dynamic_smooth = 1;
+						if (spectators == 0 && allied_spectators == 0)
+						{
+							player_glow = 1;
+							dynamic_smooth = 1;
+						}
+						else
+						{
+							player_glow = 0;
+							dynamic_smooth = 1;
+							printf("spectator!! in move\t");
+						}
 					}
 					else if (acuracy_level == 4)
 					{
@@ -389,22 +410,22 @@ int main(int argc, char** argv)
 			if (acuracy_level == 1)
 			{
 				acuracy_level = 2;
-				printf("acuracy_level BR (high) \t");
+				printf("acuracy_level BR (high) \n");
 			}
 			else if (acuracy_level == 2)
 			{
 				acuracy_level = 3;
-				printf("acuracy_level Dynamic \t");
+				printf("acuracy_level Dynamic \n");
 			}
 			else if (acuracy_level == 3)
 			{
 				acuracy_level = 4;
-				printf("acuracy_level Dynamic with Spectator \t");
+				printf("acuracy_level High Dynamic with Spectator \n");
 			}
 			else if (acuracy_level == 4)
 			{
 				acuracy_level = 1;
-				printf("acuracy_level Arena (Low) \t");
+				printf("acuracy_level Arena (Low) \n");
 			}
 
 
