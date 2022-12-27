@@ -4,11 +4,11 @@
 #define VERSION STEAM
 
 #if VERSION == STEAM
-    #define OFFSET_ENTITYLIST			0x1b0d678
-    #define OFFSET_LOCAL_ENT			0x1ebe3e8 //LocalPlayer
-    #define OFFSET_NAME_LIST            0xbbd07c0
-    #define OFFSET_THIRDPERSON          0x01af2520 + 0x6c //thirdperson_override + 0x6c
-    #define OFFSET_TIMESCALE            0x014ac600 //host_timescale
+    #define OFFSET_ENTITYLIST			0x1b0e718
+    #define OFFSET_LOCAL_ENT			0x1ebf528 //LocalPlayer
+    #define OFFSET_NAME_LIST            0xbbd1840
+    #define OFFSET_THIRDPERSON          0x01af35c0 + 0x6c //thirdperson_override + 0x6c
+    #define OFFSET_TIMESCALE            0x014ad6a0 //host_timescale
 
 
 
@@ -41,7 +41,7 @@
 
 
     #define OFFSET_MATRIX				0x11a210
-    #define OFFSET_RENDER				0x763e7b0
+    #define OFFSET_RENDER				0x76419b0
 
     #define OFFSET_WEAPON				0x1a14//m_latestPrimaryWeapons
     #define OFFSET_BULLET_SPEED         0x1ef0//CWeaponX!m_flProjectileSpeed
@@ -67,7 +67,8 @@
     #define GLOW_COLOR                  0x1D0 // Script_CopyHighlightState 15th mov
     #define GLOW_FADE                   0x388 // Script_Highlight_GetCurrentInsideOpacity 3rd result of 3 offsets consecutive or first + 8    
 
-    #define OFFSET_IS_ATTACKING         0x075197f0 + 0x8 // kbutton_t in_attack state
+    #define OFFSET_IS_ATTACKING         0x075197f0 + 0x8 // kbutton_t in_attack state..
+
     #define OFFSET_AMMO_IN_CLIP         0x1624 // m_ammoInClip
 
 #elif VERSION == ORIGIN
