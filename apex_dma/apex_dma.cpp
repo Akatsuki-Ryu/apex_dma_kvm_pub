@@ -64,6 +64,9 @@ float lastvis_aim[toRead];
 int tmp_spec = 0, spectators = 0;
 int tmp_all_spec = 0, allied_spectators = 0;
 
+int aliveenemy_cal = 0;
+int aliveenemy = -1;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SetPlayerGlow(Entity& LPlayer, Entity& Target, int index)
@@ -167,6 +170,10 @@ void ProcessPlayer(Entity& LPlayer, Entity& target, uint64_t entitylist, int ind
 				tmp_spec++;
 		}
 		return;
+	}
+	else
+	{
+		aliveenemy_cal++;
 	}
 
 	Vector EntityPosition = target.getPosition();
@@ -337,6 +344,8 @@ void DoActions()
 
 					ProcessPlayer(LPlayer, Target, entitylist, i);
 				}
+				aliveenemy = aliveenemy_cal;
+				aliveenemy_cal = 0;
 			}
 
 
@@ -473,6 +482,7 @@ static void AimbotLoop()
 }
 
 static void PrintVarsToConsole() {
+	printf("alive enemy\t %d", aliveenemy);
 	printf("\n Spectators\t\t\t\t\t\t\t     Glow\n");
 	printf("Enemy  Ally   Smooth\t   Aimbot\t     If Spectators\t Items  Players\n");
 
