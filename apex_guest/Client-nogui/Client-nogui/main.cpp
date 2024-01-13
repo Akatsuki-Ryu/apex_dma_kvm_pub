@@ -439,9 +439,9 @@ int main(int argc, char** argv)
 		{
 
 
-			bonehitbox = rand() % 10;
+			bonehitbox = rand() % 15; // more random options
 			//printf("%d\t", rand() % 10);
-			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			std::this_thread::sleep_for(std::chrono::milliseconds(100)); // make the change slower
 		}
 		else if (dynamic_aim == 0)
 		{
