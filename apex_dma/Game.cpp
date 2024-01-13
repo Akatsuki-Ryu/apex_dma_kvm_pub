@@ -366,6 +366,9 @@ float CalculateFov(Entity& from, Entity& target)
 	return Math::GetFov2(ViewAngles, Angle);
 }
 
+extern float veltest;
+extern float deltaTime;
+
 Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bone, int smooth, int aim_no_recoil)
 {
 	Vector LocalCamera = from.GetCamPos();
@@ -378,10 +381,13 @@ Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bon
 	float BulletGrav = curweap.get_projectile_gravity();
 	float zoom_fov = curweap.get_zoom_fov();
 
-	if (zoom_fov != 0.0f && zoom_fov != 1.0f)
-	{
-		max_fov *= zoom_fov/90.0f;
-	}
+	// in the new version, this zoom fov data is strange , so i dont correct it to the max fov anymore 
+	//if (zoom_fov != 0.0f && zoom_fov != 1.0f)
+	//{
+	//	max_fov *= zoom_fov/90.0f;
+		//std::cout << max_fov << std::endl;
+	//}
+	
 
 	/*
 	//simple aim prediction
@@ -406,6 +412,21 @@ Vector CalculateBestBoneAim(Entity& from, Entity& target, float max_fov, int bon
 		Ctx.BulletGravity = BulletGrav + (BulletGrav*0.05);
 		Ctx.TargetVel = target.getAbsVelocity();
 
+
+		/*
+		Vector targetVel = target.getAbsVelocity();
+
+		// Calculate the time since the last frame (in seconds)
+		float deltaTime = 0.079f;
+
+		// Add the target's velocity to the prediction context, with an offset in the y direction
+		float distanceToTarget = (TargetBonePosition - LocalCamera).Length();
+		float timeToTarget = distanceToTarget / BulletSpeed;
+		Vector targetPosAhead = TargetBonePosition + (targetVel * timeToTarget);
+		Ctx.TargetVel = Vector(targetVel.x, targetVel.y + (targetVel.Length() * deltaTime + 1.0f), targetVel.z);
+		Ctx.TargetPos = targetPosAhead;
+		*/
+		
 		if (BulletPredict(Ctx))
 			CalculatedAngles = Vector{Ctx.AimAngles.x, Ctx.AimAngles.y, 0.f};
     }
