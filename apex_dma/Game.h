@@ -56,7 +56,7 @@ public:
 	float GetYaw();
 
 
-	void enableGlow(GColor color);
+	void enableGlow();
 	void disableGlow();
 	void SetViewAngles(SVector angles);
 	void SetViewAngles(Vector& angles);

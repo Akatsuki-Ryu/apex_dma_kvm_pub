@@ -11,6 +11,9 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+#include <array>
+#include <map>
+
 Memory apex_mem;
 Memory client_mem;
 
@@ -33,6 +36,24 @@ float recoil_control = 0.50f;	// recoil reduction by this value, 1 = 100% = no r
 Vector last_sway = Vector();	// used to determine when to reduce recoil
 int last_sway_counter = 0;		// to determine if we might be shooting a semi-auto rifle so we need to hold to last_sway
 bool item_glow = true;
+int glowtype;
+int glowtype2;
+int glowtype3;
+
+//Player Glow Color and Brightness.
+//inside fill
+unsigned char insidevalue = 0;  //0 = no fill, 14 = full fill
+//Outline size
+unsigned char outlinesize = 200; // 0-255
+//Item Configs
+int itemglowbrightness = 8; //10 is none and 0 is full glow like the sun in your eye's.
+
+int settingIndex;
+int contextId;
+std::array<float, 3> highlightParameter;
+
+
+
 bool firing_range = false;
 bool target_allies = false;
 int aim_no_recoil = 0;			//  0= normal recoil, 1 = use recoil control, 2 = aiming no recoil // when using recoil control , make sure the aimbot is off
@@ -82,15 +103,25 @@ void SetPlayerGlow(Entity& LPlayer, Entity& Target, int index)
 					if ((Target.getTeamId() == LPlayer.getTeamId()) && !target_allies)
 					{
 						color = { 0.f, 2.f, 3.f };
+						contextId = 7;
+						settingIndex = 43;
+						highlightParameter = { 0.f, 2.f, 3.f };
+		
 					}
 					else if (!(firing_range) && (Target.isKnocked() || !Target.isAlive()))
 					{
 						color = { 3.f, 3.f, 3.f };
+						contextId = 11;
+						settingIndex = 80;
+						highlightParameter = { 2.f, 2.f, 2.f };
 					}
 					else if (Target.lastVisTime() > lastvis_aim[index] || (Target.lastVisTime() < 0.f && lastvis_aim[index] > 0.f))
 					{
 						//color = { 0.f, 1.f, 0.f };
-						color = { 0.f, 250.f, 0.f };
+						color = { 10.f, 100.f, 0.f };
+						contextId = 6;
+						settingIndex = 81;
+						highlightParameter = { 10.f, 100.f, 0.f };
 					}
 					else
 					{
@@ -99,30 +130,50 @@ void SetPlayerGlow(Entity& LPlayer, Entity& Target, int index)
 						if (shield > 100)
 						{ //Heirloom armor - Red
 							color = { 3.f, 0.f, 0.f };
+							contextId = 8;
+							settingIndex = 82;
+							highlightParameter = { 1.f, 0.f, 0.f };
 						}
 						else if (shield > 75)
 						{ //Purple armor - Purple
-							color = { 1.84f, 0.46f, 2.07f };
+							//color = { 1.84f, 0.46f, 2.07f };
+							contextId = 9;
+							settingIndex = 83;
+							highlightParameter = { 2.84f, 0.16f, 2.67f };
 						}
 						else if (shield > 50)
 						{ //Blue armor - Light blue
-							color = { 0.39f, 1.77f, 2.85f };
+							//color = { 0.39f, 1.77f, 2.85f };
+							contextId = 10;
+							settingIndex = 84;
+							highlightParameter = { 0.19f, 0.57f, 2.85f };
 						}
 						else if (shield > 0)
 						{ //White armor - White
-							color = { 2.f, 2.f, 2.f };
+							//color = { 2.f, 2.f, 2.f };
+							contextId = 5;
+							settingIndex = 85;
+							highlightParameter = { 3.f, 3.f, 3.f };
 						}
-						else if (Target.getHealth() > 50)
+						else if (shield == 0 && Target.getHealth() > 50)
 						{ //Above 50% HP - Orange
-							color = { 3.5f, 1.8f, 0.f };
+							//color = { 3.5f, 1.8f, 0.f };
+							contextId = 4;
+							settingIndex = 86;
+							highlightParameter = { 3.5f, 1.8f, 0.f };
 						}
-						else
+						else if (shield == 0 && Target.getHealth() < 50)
 						{ //Below 50% HP - Light Red
-							color = { 3.28f, 0.78f, 0.63f };
+							//color = { 3.28f, 0.78f, 0.63f };
+							contextId = 3;
+							settingIndex = 87;
+							highlightParameter = { 3.28f, 0.28f, 0.33f };
 						}
 					}
 
-					Target.enableGlow(color);
+					//Target.enableGlow(color);
+					Target.enableGlow();
+
 				}
 			}
 		}
@@ -691,7 +742,28 @@ static void item_glow_t()
 
 					if(item.isItem() && !item.isGlowing())
 					{
-						item.enableGlow();
+						//item.enableGlow();
+
+			
+			
+							std::array<unsigned char, 4> highlightFunctionBits = {
+								0,   // InsideFunction  HIGHLIGHT_FILL_LOOT_SCANNED
+								125,   // OutlineFunction HIGHLIGHT_OUTLINE_LOOT_SCANNED 
+								125,
+								64
+							};
+							std::array<float, 3> highlightParameter = { 0.2, 0.21255, 0.29412 };
+							apex_mem.Write<uint32_t>(centity + OFFSET_GLOW_THROUGH_WALLS, 2);
+							static const int contextId = 0;
+							int settingIndex = 74;
+							apex_mem.Write<unsigned char>(centity + OFFSET_HIGHLIGHTSERVERACTIVESTATES + contextId, settingIndex);
+							long highlightSettingsPtr;
+							apex_mem.Read<long>(g_Base + HIGHLIGHT_SETTINGS, highlightSettingsPtr);
+							apex_mem.Write<typeof(highlightFunctionBits)>(highlightSettingsPtr + 40 * settingIndex + 4, highlightFunctionBits);
+							apex_mem.Write<typeof(highlightParameter)>(highlightSettingsPtr + 40 * settingIndex + 8, highlightParameter);
+				
+
+
 					}
 				}
 				k = 1;
@@ -710,7 +782,8 @@ static void item_glow_t()
 
 						if(item.isItem() && item.isGlowing())
 						{
-							item.disableGlow();
+							//item.disableGlow();
+
 						}
 					}
 					k = 0;
