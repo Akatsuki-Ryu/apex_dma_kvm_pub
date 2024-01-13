@@ -73,7 +73,7 @@ void SetPlayerGlow(Entity& LPlayer, Entity& Target, int index)
 {
 	if (player_glow >= 1)
 	{
-		if (LPlayer.getPosition().z < 8000.f && Target.getPosition().z < 8000.f)
+		if (LPlayer.getPosition().z < 17000.f && Target.getPosition().z < 17000.f)
 		{
 			if (!Target.isGlowing() || (int)Target.buffer[OFFSET_GLOW_THROUGH_WALLS_GLOW_VISIBLE_TYPE] != 1 || (int)Target.buffer[GLOW_FADE] != 872415232) {
 				float currentEntityTime = 5000.f;
