@@ -11,8 +11,8 @@ int spectators = 128; //write
 int allied_spectators = 1; //write
 bool aiming = false; //read
 uint64_t g_Base = 0; //write
-float max_dist = 300.0f * 40.0f; //read
-float max_fov = 10.0f;
+float max_dist = 100.0f * 40.0f; //read
+float max_fov = 100.0f; //for farming bot
 int bonehitbox = 2;
 int bone_acurate = 0;
 int smooth_acurate = 30;
@@ -30,7 +30,7 @@ bool decSmooth_pressed = 0;
 int safe_level = 0; //read
 bool updateSafeLevel_pressed = 0;
 
-int acuracy_level = 3; //1 is low acuracy for arena , 2 is for BR , 3 is dynamic acuracy with spectator , 4 is high dynamic acuracy with spectator 
+int acuracy_level = 2; //1 is low acuracy for arena , 2 is for BR , 3 is dynamic acuracy with spectator , 4 is high dynamic acuracy with spectator 
 bool updateacuracyLevel_pressed = 0;
 
 bool item_glow = true;
