@@ -1,45 +1,42 @@
-//Date 01/10/2023
+//Date 1/10/2024
 //GameVersion=v3.0.52.26
-//KrackerCo's Fork
 
+#define OFFSET_ENTITYLIST 0x1db2ed8 //cl_entitylist  updated 1/10/2024
+#define OFFSET_LOCAL_ENT 0x21615d8 //LocalPlayer updated 1/10/2024
+#define OFFSET_NAME_LIST 0xc451fb0 //NameList updated 1/10/2024
+#define OFFSET_GLOBAL_VARS 0x16d65c0 // GlobalVars updated 1/10/2024
 
+#define OFFSET_LEVELNAME 0x16d5ab0 //LevelName //updated 1/10/2024
+#define OFFSET_CLIENTSTATE OFFSET_LEVELNAME - 0x1c0 //ClientState  ClientState = LevelName - 0x1C0  //updated 1/10/2024
+#define OFFSET_SIGNONSTATE OFFSET_CLIENTSTATE + 0xAC //SignonState   ( ClientState + 0xAC)  //updated 1/10/2024
+#define OFFSET_HOST_MAP 0x015ede90 + 0x58 //host_map + 0x58 //updated 1/10/2024
 
-#define OFFSET_ENTITYLIST 0x1db1cf8 //cl_entitylist  updated 11/21/2023
-#define OFFSET_LOCAL_ENT 0x21603f8 //LocalPlayer might be moved to AVC_GameMovement updated 11/21/2023
-#define OFFSET_NAME_LIST 0xc450df0 //NameList updated 11/21/2023
-#define OFFSET_GLOBAL_VARS 0x16d55b0 // GlobalVars updated 11/21/2023
+#define OFFSET_TEAM 0x030c //m_iTeamNum//updated 1/10/2024
+#define OFFSET_HEALTH 0x02fc //m_iHealth//updated 1/10/2024
+#define OFFSET_SHIELD 0x01a0 //m_shieldHealth//updated 1/10/2024
+#define OFFSET_MAXSHIELD 0x01a4 //m_shieldHealthMax//updated 1/10/2024
+#define OFFSET_ARMORTYPE 0x45cc //m_armorType //updated 1/10/2024
+#define OFFSET_NAME 0x0449 //m_iName //updated 1/10/2024
+#define OFFSET_SIGN_NAME 0x0440 //m_iSignifierName//updated 1/10/2024
+#define OFFSET_ABS_VELOCITY 0x0170 //m_vecAbsVelocity //updated 1/10/2024
+#define OFFSET_VISIBLE_TIME 0x1950 //CPlayer!lastVisibleTime  //updated 1/10/2024
+#define OFFSET_ZOOMING 0x1b91 //m_bZooming //updated 1/10/2024
+#define OFFSET_TRAVERSAL_PROGRESS 0x2abc //m_traversalProgress //updated 1/10/2024
+#define OFFSET_TRAVERSAL_STARTTIME 0x2ac0 //m_traversalStartTime //updated 1/10/2024
+#define OFFSET_PLATFORM_UID 0x2508 //m_platformUserId //updated 1/10/2024
 
-#define OFFSET_LEVELNAME 0x16d5ab0 //LevelName //updated 11/21/2023
-#define OFFSET_CLIENTSTATE OFFSET_LEVELNAME - 0x1c0 //ClientState  ClientState = LevelName - 0x1C0  //updated 11/21/2023
-#define OFFSET_SIGNONSTATE OFFSET_CLIENTSTATE + 0xAC //SignonState   ( ClientState + 0xAC)  //updated 11/21/2023
-#define OFFSET_HOST_MAP 0x015ede90 + 0x58 //host_map + 0x58 //updated 11/21/2023
-
-#define OFFSET_TEAM 0x037c //m_iTeamNum //uupdated 11/21/2023
-#define OFFSET_HEALTH 0x02fc //m_iHealth //uupdated 11/21/2023
-#define OFFSET_SHIELD 0x01a0 //m_shieldHealth //uupdated 11/21/2023
-#define OFFSET_MAXSHIELD 0x01a4 //m_shieldHealthMax //uupdated 11/21/2023
-#define OFFSET_ARMORTYPE 0x45cc //m_armorType //uupdated 11/21/2023
-#define OFFSET_NAME 0x0449 //m_iName //uupdated 11/21/2023
-#define OFFSET_SIGN_NAME 0x0440 //m_iSignifierName //uupdated 11/21/2023
-#define OFFSET_ABS_VELOCITY 0x0170 //m_vecAbsVelocity //uupdated 11/21/2023
-#define OFFSET_VISIBLE_TIME 0x1950 + 0x3 //CPlayer!lastVisibleTime  //uupdated 11/21/2023  // 0x1958
-#define OFFSET_ZOOMING 0x1b91 //m_bZooming //uupdated 11/21/2023
-#define OFFSET_FORCE_DUCK 0x073cc720 //in_duck //uupdated 11/21/2023
-#define OFFSET_TRAVERSAL_PROGRESS 0x2abc //m_traversalProgress //uupdated 11/21/2023
-#define OFFSET_FORCE_JUMP 0x073cc630 //in_jump //uupdated 11/21/2023
-
-#define OFFSET_WEAPON_NAME 0x1738 //m_weaponNameIndex 2nd one //uupdated 11/21/2023
-#define OFFSET_OFF_WEAPON 0x1904 //m_latestNonOffhandWeapons //uupdated 11/21/2023
-#define OFFSET_IN_ATTACK 0x073cc520 // in_attack //uupdated 11/21/2023
-#define OFFSET_IN_TOGGLE_DUCK 0x073cc560 //in_toggle_duck //uupdated 11/21/2023
-#define OFFSET_IN_ZOOM 0x073cc6b0 //in_zoom updated 11/21/2023
+#define OFFSET_WEAPON_NAME 0x1738 //DT_WeaponX.m_weaponNameIndex //updated 1/10/2024
+#define OFFSET_OFF_WEAPON 0x1904 //C_BaseCombatCharacter.m_latestNonOffhandWeapons //updated 1/10/2024
+#define OFFSET_IN_ATTACK 0x073cc520 // in_attack //updated 1/10/2024
+#define OFFSET_IN_TOGGLE_DUCK 0x073cc560 //in_toggle_duck //updated 1/10/2024
+#define OFFSET_IN_ZOOM 0x073cc6b0 //in_zoom //updated 1/10/2024
 #define OFFSET_WALL_RUN_START_TIME 0x3524 //m_wallRunStartTime updated 11/21/2023
 #define OFFSET_WALL_RUN_CLEAR_TIME 0x3528 //m_wallRunClearTime updated 11/21/2023
 #define OFFSET_FLAGS 0x00c8 //m_fFlags //uupdated 11/21/2023 updated 11/21/2023
 #define OFFSET_IN_FORWARD 0x073cc470 //in_forward //updated 11/21/2023
 
-#define OFFSET_LIFE_STATE 0x0658 //m_lifeState, >0 = dead //updated 11/21/2023
-#define OFFSET_BLEED_OUT_STATE 0x26a0 //m_bleedoutState, >0 = knocked //updated 11/21/2023
+#define OFFSET_LIFE_STATE 0x0658 //m_lifeState, >0 = dead //updated 1/10/2024
+#define OFFSET_BLEED_OUT_STATE 0x26a0 //m_bleedoutState, >0 = knocked //updated 1/10/2024
 
 #define OFFSET_ORIGIN 0x017c //m_vecAbsOrigin - 3rd offset after the first int and vector //updated 11/21/2023
 #define OFFSET_BONES 0x0d60 + 0x48 //m_nForceBone + 0x48 //updated 11/21/2023
@@ -57,8 +54,8 @@
 #define OFFSET_RENDER 0x73cb268 //ViewRender displays ESp, heath dist names etc //updated 11/21/2023
 
 #define OFFSET_WEAPON 0x18f4 //m_latestPrimaryWeapons //updated 11/21/2023
-#define OFFSET_BULLET_SPEED 0x04e4 + 0x04dc //CWeaponX!m_flProjectileSpeed maybe its WeaponSettings.projectile_launch_speed now //updated 11/21/2023
-#define OFFSET_BULLET_SCALE 0x04ec + 0x04e4 //CWeaponX!m_flProjectileScale maybe its WeaponSettings.projectile_gravity_scale now //updated 11/21/2023
+#define OFFSET_BULLET_SPEED 0x1e5c //CWeaponX!m_flProjectileSpeed maybe its WeaponSettings.projectile_launch_speed now //updated 1/10/2024
+#define OFFSET_BULLET_SCALE 0x1e64 //CWeaponX!m_flProjectileScale maybe its WeaponSettings.projectile_gravity_scale now //updated 1/10/2024
 #define OFFSET_ZOOM_FOV 0x1590 + 0x00b8 //m_playerData + m_curZoomFOV //updated 11/21/2023
 #define OFFSET_AMMO 0x1514 //m_ammoInClip first offset //updated 11/21/2023
 
@@ -84,7 +81,7 @@
 #define GLOW_TYPE 0x29c // Script_Highlight_GetState + 4 updated 11/21/2023
 #define GLOW_COLOR 0x1D0+ 0x30 // Script_CopyHighlightState 15th mov updated 11/21/2023
 #define GLOW_FADE 0x388+ 0x30 // ats 3rd result of 3 offsets consecutive or first + 8 updated 11/21/2023
-#define HIGHLIGHT_SETTINGS 0xB7A4E90 //?  //updated 01/9/2024
+#define HIGHLIGHT_SETTINGS 0xB7A6050 //?  //updated 01/9/2024
 #define HIGHLIGHT_TYPE_SIZE 0x34 //? updated 11/21/2023
 #define OFFSET_CROSSHAIR_LAST OFFSET_VISIBLE_TIME + 0x8 //CPlayer!lastCrosshairTargetTime // CPlayer!lastVisibleTime + 0x8 updated 11/21/2023
 #define OFFSET_CROSSHAIR_START 0x19C8 //CPlayer!crosshairTargetStartTime updated 01/9/2024

@@ -279,8 +279,8 @@ void Entity::enableGlow()
 	apex_mem.Write<int>(ptr + OFFSET_GLOW_THROUGH_WALLS, 2);
 	apex_mem.Write<typeof(highlightFunctionBits)>(highlightSettingsPtr + HIGHLIGHT_TYPE_SIZE * settingIndex + 4, highlightFunctionBits);
 	apex_mem.Write<typeof(highlightParameter)>(highlightSettingsPtr + HIGHLIGHT_TYPE_SIZE * settingIndex + 8, highlightParameter);
-	apex_mem.Write(g_Base + 0x26C, 1);
-	apex_mem.Write(ptr + 0x26C, 1);
+	apex_mem.Write(g_Base + 0x268, 1);
+	apex_mem.Write(ptr + 0x268, 1);
 	//printf("%f\n", deltaTime2);
 	
 
